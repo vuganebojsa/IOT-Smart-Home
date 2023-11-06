@@ -3,10 +3,11 @@ import random
 
 
 def generate_value():
+
     while True:
-        motion_detected = random.randint(-5, 5)
+        state_changed = random.randint(-5, 5)
         ret_motion = True
-        if motion_detected < 2:
+        if state_changed < -3:
             ret_motion = False
         yield ret_motion
 
