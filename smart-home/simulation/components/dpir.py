@@ -1,10 +1,8 @@
-
-from simulators.pir import run_pir_simulator
 import threading
 import time
 from locks.print_lock import print_lock
 
-from simulation.simulators.dpir import run_dpir_simulator
+from simulators.dpir import run_dus_simulator
 
 
 def dpir_callback(motion_detected, code):
@@ -20,7 +18,7 @@ def dpir_callback(motion_detected, code):
 def run_dpir(settings, threads, stop_event, code):
         if settings['simulated']:
             print("Starting " + code + " sumilator")
-            dpir_thread = threading.Thread(target = run_dpir_simulator, args=(2, dpir_callback, stop_event, code))
+            dpir_thread = threading.Thread(target = run_dus_simulator, args=(2, dpir_callback, stop_event, code))
             dpir_thread.start()
             threads.append(dpir_thread)
             print(code + " sumilator started\n")

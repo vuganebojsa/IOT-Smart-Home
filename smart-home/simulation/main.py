@@ -3,10 +3,11 @@ import threading
 from settings import load_settings
 from components.dht import run_dht
 from components.pir import run_pir
+from components.dus import run_dus
 import time
+from components.dpir import run_dpir
+from components.ds import run_ds
 
-from simulation.components.dpir import run_dpir
-from simulation.components.ds import run_ds
 
 try:
     import RPi.GPIO as GPIO
@@ -37,6 +38,9 @@ def run_ds_threads(settings, threads, stop_event):
 
     run_ds(ds1_settings, threads, stop_event, 'DS1')
 
+def run_dus_threads(settings, threads, stop_envet):
+    dus1_settings = settings['DUS1']
+    run_dus(dus1_settings, threads, stop_envet, 'DUS1')
 
 
 
@@ -49,6 +53,7 @@ if __name__ == "__main__":
         run_dht_threads(settings, threads, stop_event)
         run_pir_threads(settings, threads, stop_event)
         run_dpir_threads(settings, threads, stop_event)
+        run_dus_threads(settings, threads, stop_event)
         run_ds_threads(settings, threads, stop_event)
         while True:
             time.sleep(1)
