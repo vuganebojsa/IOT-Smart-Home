@@ -1,8 +1,8 @@
 
-
 from simulators.dht import run_dht_simulator
 import threading
 import time
+
 
 def dht_callback(humidity, temperature, code):
     t = time.localtime()
