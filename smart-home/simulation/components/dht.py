@@ -7,7 +7,6 @@ from locks.print_lock import print_lock
 
 def dht_callback(humidity, temperature, code):
     with print_lock:
-        print(code + ' readings')
         t = time.localtime()
         print("="*20)
         print(f"Timestamp: {time.strftime('%H:%M:%S', t)}")
