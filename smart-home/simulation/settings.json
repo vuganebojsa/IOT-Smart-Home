@@ -1,0 +1,55 @@
+{
+    // "DHT1": {
+    //     "simulated": false,
+    //     "pin": 17
+    // } 
+
+    // Room DHT
+    "RDH1":{
+        "simulated": false,
+        "pin": 17
+    },
+    "RDH2":{
+        "simulated": false,
+        "pin": 17
+    },
+    // Room PIR
+    "RPIR1":{
+        "simulated": false,
+        "pin": 17
+    },
+    "RPIR2":{
+        "simulated": false,
+        "pin": 17
+    },
+    // Door Membrane Switch
+    "DMS":{
+        "simulated": false,
+        "pin": 17
+    },
+    //Door Motion Sensor
+    "DPIR1":{
+        "simulated": false,
+        "pin": 17
+    },
+    // Door Buzzer
+    "DB":{
+        "simulated": false,
+        "pin": 17
+    },
+    // Door ultrasonic sensor
+    "DUS1":{
+        "simulated": false,
+        "pin": 17
+    },
+    // Door light
+    "DL":{
+        "simulated": false,
+        "pin": 17
+    },
+    // Door Sensor
+    "DS1":{
+        "simulated": false,
+        "pin": 17
+    }
+}   
