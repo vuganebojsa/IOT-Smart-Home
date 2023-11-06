@@ -5,14 +5,27 @@ import time
 from locks.print_lock import print_lock
 
 
-def ds_callback(motion_detected, code):
+current_value = True
+def ds_callback(state_changed, code):
+    global current_value
     with print_lock:
-        if motion_detected:
-           t = time.localtime()
-           print("="*20)
-           print(f"Timestamp: {time.strftime('%H:%M:%S', t)}")
-           print(f"Code: {code}")
-           print(f"Motion detected\n")
+        if state_changed:
+            if current_value == True:
+                current_value = False
+                t = time.localtime()
+                print("=" * 20)
+                print(f"Timestamp: {time.strftime('%H:%M:%S', t)}")
+                print(f"Code: {code}")
+                print(f"Door opened\n")
+            else:
+                current_value = True
+                t = time.localtime()
+                print("=" * 20)
+                print(f"Timestamp: {time.strftime('%H:%M:%S', t)}")
+                print(f"Code: {code}")
+                print(f"Door closed\n")
+
+
 
 
 def run_ds(settings, threads, stop_event, code):
