@@ -11,7 +11,7 @@ def generate_value():
         yield ret_motion
 
 
-def run_dpir_simulator(delay, callback, stop_event, code):
+def run_dus_simulator(delay, callback, stop_event, code):
     for motion in generate_value():
         time.sleep(delay)  # Delay between readings (adjust as needed)
         callback(motion, code)
