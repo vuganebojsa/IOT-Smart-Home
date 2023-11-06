@@ -35,7 +35,7 @@ def run_dpir_threads(settings, threads, stop_event):
 def run_ds_threads(settings, threads, stop_event):
     ds1_settings = settings['DS1']
 
-    run_ds(ds1_settings, threads, stop_event, 'DS')
+    run_ds(ds1_settings, threads, stop_event, 'DS1')
 
 
 
