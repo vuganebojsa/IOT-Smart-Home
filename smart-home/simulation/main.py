@@ -6,6 +6,7 @@ from components.pir import run_pir
 import time
 
 from simulation.components.dpir import run_dpir
+from simulation.components.ds import run_ds
 
 try:
     import RPi.GPIO as GPIO
@@ -27,9 +28,14 @@ def run_pir_threads(settings, threads, stop_event):
     run_pir(rpir2_settings, threads, stop_event, 'RPIR2')
 
 def run_dpir_threads(settings, threads, stop_event):
-    rpir1_settings = settings['DPIR1']
+    dpir1_settings = settings['DPIR1']
 
-    run_dpir(rpir1_settings, threads, stop_event, 'DPIR1')
+    run_dpir(dpir1_settings, threads, stop_event, 'DPIR1')
+
+def run_ds_threads(settings, threads, stop_event):
+    ds1_settings = settings['DS1']
+
+    run_ds(ds1_settings, threads, stop_event, 'DS')
 
 
 
@@ -43,6 +49,7 @@ if __name__ == "__main__":
         run_dht_threads(settings, threads, stop_event)
         run_pir_threads(settings, threads, stop_event)
         run_dpir_threads(settings, threads, stop_event)
+        run_ds_threads(settings, threads, stop_event)
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
