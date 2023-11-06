@@ -3,11 +3,11 @@
         "simulated": true,
         "pin": 17
     },
-    "RDH1":{
+    "RDHT1":{
         "simulated": true,
         "pin": 17
     },
-    "RDH2":{
+    "RDHT2":{
         "simulated": true,
         "pin": 17
     },
