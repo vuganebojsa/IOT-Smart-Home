@@ -7,7 +7,7 @@ from components.dus import run_dus
 import time
 from components.dpir import run_dpir
 from components.ds import run_ds
-
+from locks.print_lock import print_lock
 
 try:
     import RPi.GPIO as GPIO
@@ -38,11 +38,46 @@ def run_ds_threads(settings, threads, stop_event):
 
     run_ds(ds1_settings, threads, stop_event, 'DS1')
 
-def run_dus_threads(settings, threads, stop_envet):
+def run_dus_threads(settings, threads, stop_event):
     dus1_settings = settings['DUS1']
-    run_dus(dus1_settings, threads, stop_envet, 'DUS1')
+    run_dus(dus1_settings, threads, stop_event, 'DUS1')
 
-
+def menu(stop_event):
+    while not stop_event.is_set():
+        user_input = input("Press 'm' to open the menu: ")
+        if user_input == "m":
+            while True:
+                with print_lock:
+                    print("Menu Options:")
+                    print("Press l to control Door Light")
+                    print("Press b to control Door Buzzer")
+                    print("Press m to control Door Membrane Switch")
+                    print("Press 'e' to exit the menu")
+                    user_input = input("Enter your choice: ")
+                    if user_input == "l":
+                        while True:
+                            print('Current Light state: ')
+                            print('Press any key but e to change state')
+                            print('Press e to exit to main menu')
+                            user_input = input('Enter your choice: ')
+                            if user_input == "e":
+                                print("Exiting the menu. Printing is resumed.")
+                                break
+                            else:
+                                print('State changed')
+                    elif user_input == "m":
+                        pass
+                    elif user_input == "b":
+                        pass
+                    elif user_input == "e":
+                        print("Exiting the menu. Printing is resumed.")
+                        break
+        else:
+            break
+def run_menu_thread(threads, stop_event):
+    thread = threading.Thread(target = menu, args=(stop_event,))
+    thread.start()
+    threads.append(thread)
 
 if __name__ == "__main__":
     print('Starting app')
@@ -55,7 +90,9 @@ if __name__ == "__main__":
         run_dpir_threads(settings, threads, stop_event)
         run_dus_threads(settings, threads, stop_event)
         run_ds_threads(settings, threads, stop_event)
+        run_menu_thread(threads, stop_event)
         while True:
+            
             time.sleep(1)
     except KeyboardInterrupt:
         print('Stopping app')
