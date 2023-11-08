@@ -18,7 +18,7 @@ def dpir_callback(motion_detected, code):
 def run_dpir(settings, threads, stop_event, code):
         if settings['simulated']:
             print("Starting " + code + " sumilator")
-            dpir_thread = threading.Thread(target = run_dus_simulator, args=(2, dpir_callback, stop_event, code))
+            dpir_thread = threading.Thread(target = run_dus_simulator, args=(5, dpir_callback, stop_event, code))
             dpir_thread.start()
             threads.append(dpir_thread)
             print(code + " sumilator started\n")
@@ -26,7 +26,7 @@ def run_dpir(settings, threads, stop_event, code):
             from sensors.dht import run_dht_loop, DHT
             print("Starting " + code + " loop")
             dht = DHT(settings['pin'])
-            pir_thread = threading.Thread(target=run_dht_loop, args=(dht, 2, dpir_callback, stop_event, code))
+            pir_thread = threading.Thread(target=run_dht_loop, args=(dht, 5, dpir_callback, stop_event, code))
             pir_thread.start()
             threads.append(pir_thread)
             print(code + " loop started")

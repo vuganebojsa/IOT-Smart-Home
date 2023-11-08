@@ -17,7 +17,7 @@ def dus_callback(distance, code):
 def run_dus(settings, threads, stop_event, code):
         if settings['simulated']:
             print("Starting " + code + " sumilator")
-            dus_thread = threading.Thread(target = run_dus_simulator, args=(2, dus_callback, stop_event, code))
+            dus_thread = threading.Thread(target = run_dus_simulator, args=(5, dus_callback, stop_event, code))
             dus_thread.start()
             threads.append(dus_thread)
             print(code + " sumilator started\n")
@@ -25,7 +25,7 @@ def run_dus(settings, threads, stop_event, code):
             from sensors.dht import run_dht_loop, DHT
             print("Starting " + code + " loop")
             dht = DHT(settings['pin'])
-            pir_thread = threading.Thread(target=run_dht_loop, args=(dht, 2, dus_callback, stop_event, code))
+            pir_thread = threading.Thread(target=run_dht_loop, args=(dht, 5, dus_callback, stop_event, code))
             pir_thread.start()
             threads.append(pir_thread)
             print(code + " loop started")
