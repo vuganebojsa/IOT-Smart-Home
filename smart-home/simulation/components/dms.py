@@ -23,10 +23,17 @@ def run_dms(settings, threads, stop_event, code):
             threads.append(dms_thread)
             print(code + " sumilator started\n")
         else:
-            from sensors.dht import run_dms_loop, DHT
+            from sensors.dms import detect_motion
             print("Starting " + code + " loop")
-            dht = DHT(settings['pin'])
-            dms_thread = threading.Thread(target=run_dms_loop, args=(dht, 5, dms_callback, stop_event, code))
-            dms_thread.start()
-            threads.append(dms_thread)
+            r1 = settings['R1']
+            r2 = settings['R2']
+            r3 = settings['R3']
+            r4 = settings['R4']
+            c1 = settings['C1']
+            c2 = settings['C2']
+            c3 = settings['C3']
+            c4 = settings['C4']
+            pir_thread = threading.Thread(target=detect_motion, args=(code, r1, r2, r3, r4, c1, c2, c3, c4))
+            pir_thread.start()
+            threads.append(pir_thread)
             print(code + " loop started")

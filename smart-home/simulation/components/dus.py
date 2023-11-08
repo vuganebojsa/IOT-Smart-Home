@@ -22,10 +22,11 @@ def run_dus(settings, threads, stop_event, code):
             threads.append(dus_thread)
             print(code + " sumilator started\n")
         else:
-            from sensors.dht import run_dht_loop, DHT
+            from sensors.dus import detect_distance
             print("Starting " + code + " loop")
-            dht = DHT(settings['pin'])
-            pir_thread = threading.Thread(target=run_dht_loop, args=(dht, 5, dus_callback, stop_event, code))
-            pir_thread.start()
-            threads.append(pir_thread)
+            pin_trig = settings['pin_trig']
+            pin_echo = settings['pin_echo']
+            dus_thread = threading.Thread(target=detect_distance, args=(pin_trig, pin_echo, code))
+            dus_thread.start()
+            threads.append(dus_thread)
             print(code + " loop started")

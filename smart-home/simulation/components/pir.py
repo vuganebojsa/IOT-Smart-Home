@@ -23,10 +23,10 @@ def run_pir(settings, threads, stop_event, code):
             threads.append(pir_thread)
             print(code + " sumilator started\n")
         else:
-            from sensors.dht import run_dht_loop, DHT
+            from sensors.pir import detect_motion
             print("Starting " + code + " loop")
-            dht = DHT(settings['pin'])
-            pir_thread = threading.Thread(target=run_dht_loop, args=(dht, 5, pir_callback, stop_event, code))
+            pin = settings['pin']
+            pir_thread = threading.Thread(target=detect_motion, args=(pin, code))
             pir_thread.start()
             threads.append(pir_thread)
             print(code + " loop started")
