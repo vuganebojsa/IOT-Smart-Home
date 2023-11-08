@@ -29,10 +29,10 @@ def run_ds(settings, threads, stop_event, code):
             threads.append(ds_thread)
             print(code + " sumilator started\n")
         else:
-            from sensors.dht import run_dht_loop, DHT
+            from sensors.ds import press_button
             print("Starting " + code + " loop")
-            dht = DHT(settings['pin'])
-            ds_thread = threading.Thread(target=run_dht_loop, args=(dht, 5, ds_callback, stop_event, code))
+            pin = settings['pin']
+            ds_thread = threading.Thread(target=press_button, args=(pin, code))
             ds_thread.start()
             threads.append(ds_thread)
             print(code + " loop started")

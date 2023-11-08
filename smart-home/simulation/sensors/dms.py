@@ -1,6 +1,9 @@
-import RPi.GPIO as GPIO
+try:
+    import RPi.GPIO as GPIO
+except:
+    pass
 import time
-
+from locks.print_lock import print_lock
 
 def detect_motion(code, r1, r2, r3, r4, c1, c2, c3, c4):
     R1 = int(r1)
@@ -29,13 +32,17 @@ def detect_motion(code, r1, r2, r3, r4, c1, c2, c3, c4):
     def readLine(line, characters):
         GPIO.output(line, GPIO.HIGH)
         if(GPIO.input(C1) == 1):
-            print(characters[0])
+            with print_lock:
+                print(characters[0])
         if(GPIO.input(C2) == 1):
-            print(characters[1])
+            with print_lock:
+                print(characters[1])
         if(GPIO.input(C3) == 1):
-            print(characters[2])
+            with print_lock:
+                print(characters[2])
         if(GPIO.input(C4) == 1):
-            print(characters[3])
+            with print_lock:
+                print(characters[3])
         GPIO.output(line, GPIO.LOW)
 
     while True:

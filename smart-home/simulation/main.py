@@ -84,8 +84,7 @@ def menu(stop_event):
                         print("Exiting the menu. Printing is resumed.")
                         break
         else:
-            print("Else block")
-            break
+            pass
 def run_menu_thread(threads, stop_event):
     thread = threading.Thread(target = menu, args=(stop_event,))
     thread.start()

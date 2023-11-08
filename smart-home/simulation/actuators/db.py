@@ -1,7 +1,7 @@
 try:
     import RPi.GPIO as GPIO
 except:
-    print('Cant laod')
+    print('Cant load')
 import time
 from locks.print_lock import print_lock2
 
