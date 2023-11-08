@@ -37,7 +37,7 @@
     "DUS1":{
         "simulated": true,
         "pin_trig": 17,
-        "pin_echo": 16,
+        "pin_echo": 16
     },
     "DL":{
         "simulated": true,

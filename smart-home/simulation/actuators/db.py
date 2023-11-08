@@ -1,4 +1,7 @@
-import RPi.GPIO as GPIO
+try:
+    import RPi.GPIO as GPIO
+except:
+    print('Cant laod')
 import time
 from locks.print_lock import print_lock2
 
