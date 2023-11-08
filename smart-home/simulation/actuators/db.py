@@ -1,29 +1,24 @@
-
-
-
-
 import RPi.GPIO as GPIO
-GPIO.setmode(GPIO.BCM)
 import time
+from locks.print_lock import print_lock2
 
-class DHT(object):
-    buzzer_pin = 17
-    GPIO.setup(buzzer_pin, GPIO.OUT)
-
-def buzz(pitch, duration):
+def buzz(pin, code):
+    with print_lock2:
+        t = time.localtime()
+        print("="*20)
+        print(f"Timestamp: {time.strftime('%H:%M:%S', t)}")
+        print(f"Code: {code}")
+    pin = int(pin)
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(pin, GPIO.OUT)
+    pitch = 440
+    duration = 0.1
     period = 1.0 / pitch
     delay = period / 2
     cycles = int(duration * pitch)
     for i in range(cycles):
-        GPIO.output(buzzer_pin, True)
+        GPIO.output(pin, True)
         time.sleep(delay)
-        GPIO.output(buzzer_pin, False)
-    time.sleep(delay)
-try:
-while True:
-    pitch = 440
-    duration = 0.1
-buzz(pitch, duration)
-time.sleep(1)
-except KeyboardInterrupt:
-GPIO.cleanup()
+        GPIO.output(pin, False)
+        time.sleep(delay)
+    time.sleep(1)

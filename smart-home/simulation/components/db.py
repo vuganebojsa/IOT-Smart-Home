@@ -2,7 +2,7 @@
 import threading
 import time
 from locks.print_lock import print_lock2
-
+from actuators.db import buzz
 
 def db_callback(code):
 
@@ -21,10 +21,8 @@ def run_db(settings, threads, stop_event, code):
             db_thread.start()
             threads.append(db_thread)
         else:
-            from sensors.dht import run_dms_loop, DHT
-            print("Starting " + code + " loop")
-            dht = DHT(settings['pin'])
-            dms_thread = threading.Thread(target=run_dms_loop, args=(dht, 5, dms_callback, stop_event, code))
-            dms_thread.start()
-            threads.append(dms_thread)
+            pin =settings['pin']
+            db_thread = threading.Thread(target=buzz, args=(pin, code))
+            db_thread.start()
+            threads.append(db_thread)
             print(code + " loop started")
