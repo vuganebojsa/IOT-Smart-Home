@@ -35,6 +35,7 @@ mqtt_client.on_message = lambda client, userdata, msg: save_to_db(msg.topic, jso
 
 
 def save_to_db(topic, data):
+    print(data)
     write_api = influxdb_client.write_api(write_options=SYNCHRONOUS)
     if topic == 'dht':
         write_dht(write_api, data)

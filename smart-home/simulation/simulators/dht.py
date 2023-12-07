@@ -14,10 +14,10 @@ def generate_values(initial_temp = 25, initial_humidity=20):
             yield humidity, temperature
 
               
-def run_dht_simulator(delay, callback, stop_event, code):
+def run_dht_simulator(delay, callback, stop_event, settings, publish_event):
     for h, t in generate_values():
         time.sleep(delay)  # Delay between readings (adjust as needed)
-        callback(h, t, code)
+        callback(h, t, settings, publish_event)
         if stop_event.is_set():
             break
             

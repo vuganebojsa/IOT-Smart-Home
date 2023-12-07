@@ -98,12 +98,12 @@ if __name__ == "__main__":
     pause_event = threading.Event()
     try:
         run_dht_threads(settings, threads, stop_event)
-        run_pir_threads(settings, threads, stop_event)
-        run_dpir_threads(settings, threads, stop_event)
-        run_dus_threads(settings, threads, stop_event)
-        run_ds_threads(settings, threads, stop_event)
-        run_dms_threads(settings, threads, stop_event)
-        run_menu_thread(threads, stop_event)
+        # run_pir_threads(settings, threads, stop_event)
+        # run_dpir_threads(settings, threads, stop_event)
+        # run_dus_threads(settings, threads, stop_event)
+        # run_ds_threads(settings, threads, stop_event)
+        # run_dms_threads(settings, threads, stop_event)
+        # run_menu_thread(threads, stop_event)
         while True:
             
             time.sleep(0.1)
