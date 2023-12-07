@@ -2,7 +2,7 @@
 import threading
 import time
 from locks.print_lock import print_lock2
-from actuators.dl import run_dl
+from actuators.dl import run_light
 result = True
 def dl_callback(code):
     global result
@@ -26,7 +26,7 @@ def run_dl(settings, threads, stop_event, code):
             threads.append(dl_thread)
         else:
             pin =settings['pin']
-            dms_thread = threading.Thread(target=run_dl, args=(pin, code))
+            dms_thread = threading.Thread(target=run_light, args=(pin, code))
             dms_thread.start()
             threads.append(dms_thread)
             print(code + " loop started")

@@ -5,7 +5,7 @@ except:
 import time
 from locks.print_lock import print_lock2
         
-def run_dl(pin, code):
+def run_light(pin, code):
     with print_lock2:
         t = time.localtime()
         print("="*20)
