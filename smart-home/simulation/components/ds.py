@@ -3,36 +3,58 @@ from simulators.ds import run_ds_simulator
 import threading
 import time
 from locks.print_lock import print_lock
+import paho.mqtt.publish as publish
+from broker_settings import HOSTNAME, PORT
+import json
 
+dht_batch = []
+publish_data_counter = 0
+publish_data_limit = 5
 
+def publisher_task(event, dht_batch):
+    global publish_data_counter, publish_data_limit
+    while True:
+        event.wait()
+        with print_lock:
+            local_dht_batch = dht_batch.copy()
+            publish_data_counter = 0
+            dht_batch.clear()
+        publish.multiple(local_dht_batch, hostname=HOSTNAME, port=PORT)
+        print(f'published {publish_data_limit} ds values')
+        event.clear()
 
-def ds_callback(current_value, code):
-
+def ds_callback(current_value, settings,publish_event):
+    global publish_data_counter, publish_data_limit
+    payload = {
+        'measurement': 'Current_Value',
+        'simulated': settings['simulated'],
+        'runs_on': settings['runs_on'],
+        'name': settings['name'],
+        'value': current_value,
+    }
     with print_lock:
-        t = time.localtime()
-        print("=" * 20)
-        print(f"Timestamp: {time.strftime('%H:%M:%S', t)}")
-        print(f"Code: {code}")
-        if current_value:
-            print(f"Door opened\n")
-        else:
-            print(f"Door closed\n")
+        dht_batch.append(('ds', json.dumps(payload), 0, True))
+        publish_data_counter += 1
+
+    if publish_data_counter >= publish_data_limit:
+        publish_event.set()
 
 
-
+publish_event = threading.Event()
+publisher_thread = threading.Thread(target=publisher_task, args=(publish_event, dht_batch,))
+publisher_thread.daemon = True
+publisher_thread.start()
 
 def run_ds(settings, threads, stop_event, code):
         if settings['simulated']:
-            print("Starting " + code + " sumilator")
-            ds_thread = threading.Thread(target = run_ds_simulator, args=(5, ds_callback, stop_event, code))
+            ds_thread = threading.Thread(target = run_ds_simulator, args=(5, ds_callback, stop_event, settings, publish_event))
             ds_thread.start()
             threads.append(ds_thread)
             print(code + " sumilator started\n")
         else:
             from sensors.ds import press_button
-            print("Starting " + code + " loop")
             pin = settings['pin']
-            ds_thread = threading.Thread(target=press_button, args=(pin, code))
+            ds_thread = threading.Thread(target=press_button,
+                                          args=(pin, ds_callback, stop_event, settings, publish_event))
             ds_thread.start()
             threads.append(ds_thread)
-            print(code + " loop started")
