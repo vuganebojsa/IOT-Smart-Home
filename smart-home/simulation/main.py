@@ -66,9 +66,6 @@ def menu(stop_event):
         if user_input == "m":
             while True:
                 with print_lock:
-                    # user_input = input()
-                    # if user_input != 'm':
-                    #     continue
                     print("Menu Options:")
                     print("Press l to control Door Light")
                     print("Press b to control Door Buzzer")
@@ -103,7 +100,7 @@ if __name__ == "__main__":
         # run_dus_threads(settings, threads, stop_event)
         # run_ds_threads(settings, threads, stop_event)
         # run_dms_threads(settings, threads, stop_event)
-        # run_menu_thread(threads, stop_event)
+        run_menu_thread(threads, stop_event)
         while True:
             
             time.sleep(0.1)
