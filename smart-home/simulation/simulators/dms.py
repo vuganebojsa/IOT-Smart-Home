@@ -11,9 +11,9 @@ def generate_value():
         yield result_str
 
 
-def run_dms_simulator(delay, callback, stop_event, code):
+def run_dms_simulator(delay, callback, stop_event, settings, publish_event):
     for generated_text in generate_value():
         time.sleep(delay)  # Delay between readings (adjust as needed)
-        callback(generated_text, code)
+        callback(generated_text, settings, publish_event)
         if stop_event.is_set():
             break

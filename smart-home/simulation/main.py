@@ -47,7 +47,7 @@ def run_dus_threads(settings, threads, stop_event):
 
 def run_dms_threads(settings, threads, stop_event):
     dms_settings = settings['DMS']
-    run_dms(dms_settings, threads, stop_event, 'DMS')
+    run_dms(dms_settings, threads, stop_event)
 
 def run_dl_threads(settings, threads, stop_event):
     dl_settings = settings["DL"]
@@ -99,7 +99,7 @@ if __name__ == "__main__":
         # run_dpir_threads(settings, threads, stop_event)
         run_dus_threads(settings, threads, stop_event)
         # run_ds_threads(settings, threads, stop_event)
-        # run_dms_threads(settings, threads, stop_event)
+        run_dms_threads(settings, threads, stop_event)
         run_menu_thread(threads, stop_event)
         while True:
             
