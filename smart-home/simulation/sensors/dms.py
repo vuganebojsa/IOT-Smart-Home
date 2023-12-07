@@ -5,7 +5,7 @@ except:
 import time
 from locks.print_lock import print_lock
 
-def detect_motion(code, r1, r2, r3, r4, c1, c2, c3, c4):
+def detect_motion(r1, r2, r3, r4, c1, c2, c3, c4, dms_callback, stop_event, settings, publish_event):
     R1 = int(r1)
     R2 = int(r2)
     R3 = int(r3)
@@ -30,26 +30,31 @@ def detect_motion(code, r1, r2, r3, r4, c1, c2, c3, c4):
     GPIO.setup(C4, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
     def readLine(line, characters):
+        line = ''
         GPIO.output(line, GPIO.HIGH)
         if(GPIO.input(C1) == 1):
-            with print_lock:
-                print(characters[0])
+            line += characters[0]
         if(GPIO.input(C2) == 1):
-            with print_lock:
-                print(characters[1])
+            line += characters[1]
+
         if(GPIO.input(C3) == 1):
-            with print_lock:
-                print(characters[2])
+            line += characters[2]
+
         if(GPIO.input(C4) == 1):
-            with print_lock:
-                print(characters[3])
+            line += characters[3]
         GPIO.output(line, GPIO.LOW)
+
+        return line
 
     while True:
         # call the readLine function for each row of the keypad
-        readLine(R1, ["1","2","3","A"])
-        readLine(R2, ["4","5","6","B"])
-        readLine(R3, ["7","8","9","C"])
-        readLine(R4, ["*","0","#","D"])
+        lines = ''
+        lines += readLine(R1, ["1","2","3","A"])
+        lines += readLine(R2, ["4","5","6","B"])
+        lines += readLine(R3, ["7","8","9","C"])
+        lines += readLine(R4, ["*","0","#","D"])
+        dms_callback(lines, settings, publish_event)
         time.sleep(0.2)
+        if stop_event.is_set():
+            break
 
