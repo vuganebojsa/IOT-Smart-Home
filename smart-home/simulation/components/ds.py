@@ -25,12 +25,15 @@ def publisher_task(event, dht_batch):
 
 def ds_callback(current_value, settings,publish_event):
     global publish_data_counter, publish_data_limit
+    value = 0
+    if current_value is True:
+        value = 1
     payload = {
-        'measurement': 'Current_Value',
+        'measurement': 'Pressed',
         'simulated': settings['simulated'],
         'runs_on': settings['runs_on'],
         'name': settings['name'],
-        'value': current_value,
+        'value': value,
     }
     with print_lock:
         dht_batch.append(('ds', json.dumps(payload), 0, True))

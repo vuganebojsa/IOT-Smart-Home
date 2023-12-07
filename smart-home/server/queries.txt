@@ -1,0 +1,37 @@
+Humidity all sensors
+
+from(bucket: "iot_smart_home")
+  |> range(start: -10m)
+  |> filter(fn: (r) => r["_measurement"] == "Humidity")
+  |> filter(fn: (r) => r["_field"] == "measurement")
+
+
+Temperature all sensors
+
+from(bucket: "iot_smart_home")
+  |> range(start: -10m)
+  |> filter(fn: (r) => r["_measurement"] == "Temperature")
+  |> filter(fn: (r) => r["_field"] == "measurement")
+
+
+from(bucket: "iot_smart_home")
+  |> range(start: -10m)
+  |> filter(fn: (r) => r["_measurement"] == "Distance")
+  |> filter(fn: (r) => r["_field"] == "measurement")
+
+
+  from(bucket: "iot_smart_home")
+  |> range(start: -10m)
+  |> filter(fn: (r) => r["_measurement"] == "Motion")
+  |> filter(fn: (r) => r["_field"] == "measurement")
+
+  from(bucket: "iot_smart_home")
+  |> range(start: -10m)
+  |> filter(fn: (r) => r["_measurement"] == "Pressed")
+  |> filter(fn: (r) => r["_field"] == "measurement")
+
+
+  from(bucket: "iot_smart_home")
+  |> range(start: -10m)
+  |> filter(fn: (r) => r["_measurement"] == "Membrane")
+  |> filter(fn: (r) => r["_field"] == "measurement")
