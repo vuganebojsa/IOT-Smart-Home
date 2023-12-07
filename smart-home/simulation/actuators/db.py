@@ -5,12 +5,7 @@ except:
 import time
 from locks.print_lock import print_lock2
 
-def buzz(pin, code):
-    with print_lock2:
-        t = time.localtime()
-        print("="*20)
-        print(f"Timestamp: {time.strftime('%H:%M:%S', t)}")
-        print(f"Code: {code}")
+def buzz(pin, callback, stop_event, settings, publish_event):
     pin = int(pin)
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(pin, GPIO.OUT)
@@ -24,4 +19,5 @@ def buzz(pin, code):
         time.sleep(delay)
         GPIO.output(pin, False)
         time.sleep(delay)
+    callback(settings, publish_event)
     time.sleep(1)

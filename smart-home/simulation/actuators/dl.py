@@ -3,19 +3,15 @@ try:
 except:
     print('Cant load')
 import time
-from locks.print_lock import print_lock2
-        
-def run_light(pin, code):
-    with print_lock2:
-        t = time.localtime()
-        print("="*20)
-        print(f"Timestamp: {time.strftime('%H:%M:%S', t)}")
-        print(f"Code: {code}")
+
+def run_light(pin, callback, stop_event, settings, publish_event):
+
     pin = int(pin)
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(pin, GPIO.OUT)
-    print("Led On")
+    callback(settings, publish_event)
     GPIO.output(pin, GPIO.HIGH)
     time.sleep(1)
-    print("Led Of")
+    callback(settings, publish_event)
     GPIO.output(pin, GPIO.LOW)
+

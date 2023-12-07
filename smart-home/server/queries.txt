@@ -35,3 +35,15 @@ from(bucket: "iot_smart_home")
   |> range(start: -10m)
   |> filter(fn: (r) => r["_measurement"] == "Membrane")
   |> filter(fn: (r) => r["_field"] == "measurement")
+
+
+  from(bucket: "iot_smart_home")
+  |> range(start: -10m)
+  |> filter(fn: (r) => r["_measurement"] == "Light")
+  |> filter(fn: (r) => r["_field"] == "measurement")
+
+
+  from(bucket: "iot_smart_home")
+  |> range(start: -10m)
+  |> filter(fn: (r) => r["_measurement"] == "Buzz")
+  |> filter(fn: (r) => r["_field"] == "measurement")
