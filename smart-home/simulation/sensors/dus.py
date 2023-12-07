@@ -3,9 +3,8 @@ try:
 except:
     pass
 import time
-from locks.print_lock import print_lock
 
-def detect_distance(trig_pin, echo_pin, code):
+def detect_distance(trig_pin, echo_pin, callback, stop_event, settings, publish_event):
 
     GPIO.setmode(GPIO.BCM)
     TRIG_PIN = int(trig_pin)
@@ -42,15 +41,10 @@ def detect_distance(trig_pin, echo_pin, code):
         distance = (pulse_duration * 34300)/2
         return distance
     while True:
-            with print_lock:
-                t = time.localtime()
-                print("="*20)
-                print(f"Timestamp: {time.strftime('%H:%M:%S', t)}")
-                print(f"Code: {code}")
             distance = get_distance()
             if distance is not None:
-                print(f'Distance: {distance} cm')
-            else:
-                print('Measurement timed out')
-            time.sleep(1)
+                callback(distance, settings, publish_event)
+            time.sleep(0.5)
+            if stop_event.is_set():
+                break
     
