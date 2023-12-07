@@ -28,8 +28,8 @@ def run_dht_threads(settings, threads, stop_event):
 def run_pir_threads(settings, threads, stop_event):
     rpir1_settings = settings['RPIR1']
     rpir2_settings = settings['RPIR2']
-    run_pir(rpir1_settings, threads, stop_event, 'RPIR1')
-    run_pir(rpir2_settings, threads, stop_event, 'RPIR2')
+    run_pir(rpir1_settings, threads, stop_event)
+    run_pir(rpir2_settings, threads, stop_event)
 
 def run_dpir_threads(settings, threads, stop_event):
     dpir1_settings = settings['DPIR1']
@@ -95,7 +95,7 @@ if __name__ == "__main__":
     pause_event = threading.Event()
     try:
         run_dht_threads(settings, threads, stop_event)
-        # run_pir_threads(settings, threads, stop_event)
+        run_pir_threads(settings, threads, stop_event)
         # run_dpir_threads(settings, threads, stop_event)
         # run_dus_threads(settings, threads, stop_event)
         # run_ds_threads(settings, threads, stop_event)

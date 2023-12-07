@@ -5,22 +5,18 @@ except:
 from locks.print_lock import print_lock
 import time
 
-def motion_detected(channel):
-    print("You moved")
+def motion_detected(channel,callback, settings, publish_event):
+    callback(True, settings, publish_event)
+
 def no_motion(channel):
-    print("You stopped moving")
+    pass
 
 
-def detect_motion(pin, code):
-    with print_lock:
-        t = time.localtime()
-        print("="*20)
-        print(f"Timestamp: {time.strftime('%H:%M:%S', t)}")
-        print(f"Code: {code}")
+def detect_motion(pin, callback, stop_event, settings, publish_event):
     PIR_PIN = int(pin)
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(PIR_PIN, GPIO.IN)
-    GPIO.add_event_detect(PIR_PIN, GPIO.RISING, callback=motion_detected)
+    GPIO.add_event_detect(PIR_PIN, GPIO.RISING, callback=lambda channel: motion_detected(channel, callback, settings, publish_event))
     GPIO.add_event_detect(PIR_PIN, GPIO.FALLING, callback=no_motion)
     input("Press any key to exit...")
 
