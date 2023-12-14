@@ -1,7 +1,7 @@
 import threading
 import time
 from locks.print_lock import print_lock
-
+from datetime import datetime
 from simulators.dpir import run_dpir_simulator
 import paho.mqtt.publish as publish
 from broker_settings import HOSTNAME, PORT
@@ -32,6 +32,7 @@ def dpir_callback(motion_detected, settings, publish_event):
             'runs_on': settings['runs_on'],
             'name': settings['name'],
             'value': 1,
+            '_time': datetime.now().isoformat()
         }
         with print_lock:
             dht_batch.append(('dpir', json.dumps(payload), 0, True))

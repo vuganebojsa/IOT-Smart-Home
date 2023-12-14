@@ -6,6 +6,7 @@ from locks.print_lock import print_lock
 import paho.mqtt.publish as publish
 from broker_settings import HOSTNAME, PORT
 import json
+from datetime import datetime
 dht_batch = []
 publish_data_counter = 0
 publish_data_limit = 5
@@ -32,6 +33,7 @@ def pir_callback(motion_detected, settings, publish_event):
             'runs_on': settings['runs_on'],
             'name': settings['name'],
             'value': 1,
+            '_time': datetime.now().isoformat()
         }
         with print_lock:
             dht_batch.append(('pir', json.dumps(payload), 0, True))

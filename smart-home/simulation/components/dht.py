@@ -6,7 +6,7 @@ from locks.print_lock import print_lock
 import paho.mqtt.publish as publish
 from broker_settings import HOSTNAME, PORT
 import json
-
+from datetime import datetime
 dht_batch = []
 publish_data_counter = 0
 publish_data_limit = 5
@@ -34,7 +34,8 @@ def dht_callback(humidity, temperature, dht_settings, publish_event):
          'runs_on':dht_settings['runs_on'],
          'name':dht_settings['name'],
          'value_temperature':temperature,
-         'value_humidity': humidity
+         'value_humidity': humidity,
+        '_time': datetime.now().isoformat()
     }
     with print_lock:
         dht_batch.append(('dht', json.dumps(payload), 0, True))

@@ -3,7 +3,7 @@ import threading
 import time
 from locks.print_lock import print_lock
 from simulators.dms import run_dms_simulator
-
+from datetime import datetime
 import paho.mqtt.publish as publish
 from broker_settings import HOSTNAME, PORT
 import json
@@ -34,6 +34,7 @@ def dms_callback(result, settings, publish_event):
             'runs_on': settings['runs_on'],
             'name': settings['name'],
             'value': result,
+            '_time': datetime.now().isoformat()
     }
     with print_lock:
         dht_batch.append(('dms', json.dumps(payload), 0, True))

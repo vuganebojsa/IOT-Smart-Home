@@ -7,7 +7,7 @@ from actuators.db import buzz
 import paho.mqtt.publish as publish
 from broker_settings import HOSTNAME, PORT
 import json
-
+from datetime import datetime
 dht_batch = []
 publish_data_counter = 0
 publish_data_limit = 5
@@ -34,7 +34,9 @@ def db_callback(settings, publish_event):
         'simulated': settings['simulated'],
         'runs_on': settings['runs_on'],
         'name': settings['name'],
-        'value': "Buzzing"
+        'value': "Buzzing",
+        '_time': datetime.now().isoformat()
+        
     }
     with print_lock:
         dht_batch.append(('db', json.dumps(payload), 0, True))

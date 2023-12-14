@@ -6,6 +6,7 @@ from simulators.dus import run_dus_simulator
 import paho.mqtt.publish as publish
 from broker_settings import HOSTNAME, PORT
 import json
+from datetime import datetime
 dht_batch = []
 publish_data_counter = 0
 publish_data_limit = 5
@@ -31,6 +32,7 @@ def dus_callback(distance, settings, publish_event):
             'runs_on': settings['runs_on'],
             'name': settings['name'],
             'value': distance,
+            '_time': datetime.now().isoformat()
     }
     with print_lock:
         dht_batch.append(('dus', json.dumps(payload), 0, True))
