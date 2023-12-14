@@ -6,7 +6,8 @@ from actuators.dl import run_light
 import paho.mqtt.publish as publish
 from broker_settings import HOSTNAME, PORT
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
+
 
 dht_batch = []
 publish_data_counter = 0
@@ -35,14 +36,18 @@ def dl_callback(settings, publish_event):
         result = False
     else:
         result = True
+    current_datetime = datetime.now()
 
+    adjusted_datetime = current_datetime - timedelta(hours=1)
+
+    formatted_time = adjusted_datetime.isoformat()
     payload = {
         'measurement': 'Light',
         'simulated': settings['simulated'],
         'runs_on': settings['runs_on'],
         'name': settings['name'],
         'value': result,
-        '_time': datetime.now().isoformat()
+        '_time': formatted_time
     }
     with print_lock:
         dht_batch.append(('dl', json.dumps(payload), 0, True))

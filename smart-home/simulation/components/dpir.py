@@ -1,7 +1,8 @@
 import threading
 import time
 from locks.print_lock import print_lock
-from datetime import datetime
+from datetime import datetime, timedelta
+
 from simulators.dpir import run_dpir_simulator
 import paho.mqtt.publish as publish
 from broker_settings import HOSTNAME, PORT
@@ -26,13 +27,18 @@ def publisher_task(event, pir_batch):
 def dpir_callback(motion_detected, settings, publish_event):
     global publish_data_counter, publish_data_limit
     if motion_detected:
+        current_datetime = datetime.now()
+
+        adjusted_datetime = current_datetime - timedelta(hours=1)
+
+        formatted_time = adjusted_datetime.isoformat()
         payload = {
             'measurement': 'Motion',
             'simulated': settings['simulated'],
             'runs_on': settings['runs_on'],
             'name': settings['name'],
             'value': 1,
-            '_time': datetime.now().isoformat()
+            '_time': formatted_time
         }
         with print_lock:
             dht_batch.append(('dpir', json.dumps(payload), 0, True))

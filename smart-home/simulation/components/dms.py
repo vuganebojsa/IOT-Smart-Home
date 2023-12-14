@@ -3,7 +3,8 @@ import threading
 import time
 from locks.print_lock import print_lock
 from simulators.dms import run_dms_simulator
-from datetime import datetime
+from datetime import datetime, timedelta
+
 import paho.mqtt.publish as publish
 from broker_settings import HOSTNAME, PORT
 import json
@@ -27,14 +28,18 @@ def publisher_task(event, pir_batch):
 
 def dms_callback(result, settings, publish_event):
     global publish_data_counter, publish_data_limit
+    current_datetime = datetime.now()
 
+    adjusted_datetime = current_datetime - timedelta(hours=1)
+
+    formatted_time = adjusted_datetime.isoformat()
     payload = {
             'measurement': 'Membrane',
             'simulated': settings['simulated'],
             'runs_on': settings['runs_on'],
             'name': settings['name'],
             'value': result,
-            '_time': datetime.now().isoformat()
+            '_time': formatted_time
     }
     with print_lock:
         dht_batch.append(('dms', json.dumps(payload), 0, True))

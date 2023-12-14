@@ -12,14 +12,20 @@ def write_dht(write_api, data):
         .tag("runs_on", data["runs_on"])
         .tag("name", data["name"])
         .field("measurement", data["value_temperature"])
+        .time(data['_time'])
+
     )
+    print("Constructed Point:", point)  # Add this line for debugging
+
     write_api.write(bucket=bucket_influx, org=org_influx, record=point)
     point = (
         Point(data["measurement_humidity"])
         .tag("simulated", data["simulated"])
         .tag("runs_on", data["runs_on"])
         .tag("name", data["name"])
-        .field("measurement", data["value_humidity"])
+        .field("measurement", data["value_humidity"])        
+        .time(data['_time'])
+
     )
     write_api.write(bucket=bucket_influx, org=org_influx, record=point)
 
@@ -30,6 +36,8 @@ def write_dms(write_api, data):
         .tag("runs_on", data["runs_on"])
         .tag("name", data["name"])
         .field("measurement", data["value"])
+        .time(data['_time'])
+
     )
     write_api.write(bucket=bucket_influx, org=org_influx, record=point)
 
@@ -40,6 +48,8 @@ def write_ds(write_api, data):
         .tag("runs_on", data["runs_on"])
         .tag("name", data["name"])
         .field("measurement", data["value"])
+        .time(data['_time'])
+
     )
     write_api.write(bucket=bucket_influx, org=org_influx, record=point)
 
@@ -50,6 +60,7 @@ def write_dus(write_api, data):
         .tag("runs_on", data["runs_on"])
         .tag("name", data["name"])
         .field("measurement", data["value"])
+        .time(data['_time'])
     )
     write_api.write(bucket=bucket_influx, org=org_influx, record=point)
 
@@ -60,6 +71,7 @@ def write_pir(write_api, data):
         .tag("runs_on", data["runs_on"])
         .tag("name", data["name"])
         .field("measurement", data["value"])
+        .time(data['_time'])
     )
     write_api.write(bucket=bucket_influx, org=org_influx, record=point)
 
@@ -70,15 +82,20 @@ def write_db(write_api, data):
         .tag("runs_on", data["runs_on"])
         .tag("name", data["name"])
         .field("measurement", data["value"])
+        .time(data['_time'])
     )
     write_api.write(bucket=bucket_influx, org=org_influx, record=point)
 
 def write_dl(write_api, data):
-    point = (
-        Point(data["measurement"])
-        .tag("simulated", data["simulated"])
-        .tag("runs_on", data["runs_on"])
-        .tag("name", data["name"])
-        .field("measurement", data["value"])
-    )
-    write_api.write(bucket=bucket_influx, org=org_influx, record=point)
+
+    if '_time' in data:
+        point = (
+            Point(data["measurement"])
+            .tag("simulated", data["simulated"])
+            .tag("runs_on", data["runs_on"])
+            .tag("name", data["name"])
+            .tag('_time', data['_time'])
+            .field("measurement", data["value"])
+            .time(data['_time'])
+        )
+        write_api.write(bucket=bucket_influx, org=org_influx, record=point)

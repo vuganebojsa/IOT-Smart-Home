@@ -6,7 +6,8 @@ from locks.print_lock import print_lock
 import paho.mqtt.publish as publish
 from broker_settings import HOSTNAME, PORT
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
+
 dht_batch = []
 publish_data_counter = 0
 publish_data_limit = 5
@@ -28,13 +29,18 @@ def ds_callback(current_value, settings,publish_event):
     value = 0
     if current_value is True:
         value = 1
+    current_datetime = datetime.now()
+
+    adjusted_datetime = current_datetime - timedelta(hours=1)
+
+    formatted_time = adjusted_datetime.isoformat()
     payload = {
         'measurement': 'Pressed',
         'simulated': settings['simulated'],
         'runs_on': settings['runs_on'],
         'name': settings['name'],
         'value': value,
-        '_time': datetime.now().isoformat()
+        '_time': formatted_time
     }
     with print_lock:
         dht_batch.append(('ds', json.dumps(payload), 0, True))
