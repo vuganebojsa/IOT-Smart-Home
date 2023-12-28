@@ -88,7 +88,7 @@ def run_menu_thread(threads, stop_event):
 
 if __name__ == "__main__":
     print('Starting app')
-    settings = load_settings()
+    settings = load_settings('settingspi1.json')
     threads = []
     stop_event = threading.Event()
     pause_event = threading.Event()
