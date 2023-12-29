@@ -22,48 +22,36 @@ except:
 
 
 def run_dht_threads(settings, threads, stop_event):
-    rdht1_settings = settings['RDHT1']
-    rdht2_settings = settings['RDHT2']
-    run_dht(rdht1_settings, threads, stop_event, 'RDHT1')
-    run_dht(rdht2_settings, threads, stop_event, 'RDHT2')
+    gdht1_settings = settings['GDHT']
+    run_dht(gdht1_settings, threads, stop_event, 'GDHT')
+    rdht3_settings = settings['RDHT3']
+    run_dht(rdht3_settings, threads, stop_event, 'RDHT3')
+
 
 def run_pir_threads(settings, threads, stop_event):
-    rpir1_settings = settings['RPIR1']
-    rpir2_settings = settings['RPIR2']
-    run_pir(rpir1_settings, threads, stop_event)
-    run_pir(rpir2_settings, threads, stop_event)
+    rpir3_settings = settings['RPIR3']
+
+    run_pir(rpir3_settings, threads, stop_event)
 
 def run_dpir_threads(settings, threads, stop_event):
-    dpir1_settings = settings['DPIR1']
+    dpir2_settings = settings['DPIR2']
 
-    run_dpir(dpir1_settings, threads, stop_event)
+    run_dpir(dpir2_settings, threads, stop_event)
 
 def run_ds_threads(settings, threads, stop_event):
-    ds1_settings = settings['DS1']
-    run_ds(ds1_settings, threads, stop_event, 'DS1')
+    ds2_settings = settings['DS2']
+    run_ds(ds2_settings, threads, stop_event, 'DS2')
 
 def run_dus_threads(settings, threads, stop_event):
-    dus1_settings = settings['DUS1']
-    run_dus(dus1_settings, threads, stop_event)
-
-def run_dms_threads(settings, threads, stop_event):
-    dms_settings = settings['DMS']
-    run_dms(dms_settings, threads, stop_event)
-
-def run_dl_threads(settings, threads, stop_event):
-    dl_settings = settings["DL"]
-    run_dl(dl_settings, threads, stop_event, "DL")
-
-def run_db_threads(settings, threads, stop_event):
-    db_settings = settings["DB"]
-    run_db(db_settings, threads, stop_event, "DB")
+    dus2_settings = settings['DUS2']
+    run_dus(dus2_settings, threads, stop_event)
 
 def run_gsc_threads(settings, threads, stop_event):
     db_settings = settings["GSC"]
     run_gsc(db_settings, threads, stop_event)
 
 def run_lcd_threads(settings, threads, stop_event):
-    db_settings = settings["LCD"]
+    db_settings = settings["GLCD"]
     run_lcd(db_settings, threads, stop_event)
 
 
@@ -108,7 +96,6 @@ if __name__ == "__main__":
         run_dpir_threads(settings, threads, stop_event)
         run_ds_threads(settings, threads, stop_event)
         run_dus_threads(settings, threads, stop_event)
-        run_dms_threads(settings, threads, stop_event)
         run_gsc_threads(settings, threads,  stop_event)
         run_lcd_threads(settings,threads,stop_event)
         run_menu_thread(threads, stop_event)
