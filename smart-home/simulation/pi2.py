@@ -10,6 +10,8 @@ from components.ds import run_ds
 from components.dms import run_dms
 from components.dl import run_dl
 from components.db import run_db
+from components.gsc import run_gsc
+
 from locks.print_lock import print_lock
 
 try:
@@ -56,6 +58,14 @@ def run_db_threads(settings, threads, stop_event):
     db_settings = settings["DB"]
     run_db(db_settings, threads, stop_event, "DB")
 
+def run_gsc_threads(settings, threads, stop_event):
+    db_settings = settings["GSC"]
+    run_gsc(db_settings, threads, stop_event)
+
+def run_lcd_threads(settings, threads, stop_event):
+    db_settings = settings["LCD"]
+    run_lcd(db_settings, threads, stop_event)
+
 
 
 def menu(stop_event):
@@ -99,7 +109,10 @@ if __name__ == "__main__":
         run_ds_threads(settings, threads, stop_event)
         run_dus_threads(settings, threads, stop_event)
         run_dms_threads(settings, threads, stop_event)
+        run_gsc_threads(settings, threads,  stop_event)
+        run_lcd_threads(settings,threads,stop_event)
         run_menu_thread(threads, stop_event)
+
         while True:
             
             time.sleep(0.1)
