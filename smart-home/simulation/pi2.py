@@ -11,6 +11,7 @@ from components.dms import run_dms
 from components.dl import run_dl
 from components.db import run_db
 from components.gsc import run_gsc
+from components.lcd import run_lcd
 
 from locks.print_lock import print_lock
 
@@ -55,35 +56,6 @@ def run_lcd_threads(settings, threads, stop_event):
     run_lcd(db_settings, threads, stop_event)
 
 
-
-def menu(stop_event):
-    while not stop_event.is_set():
-        user_input = input("Press 'm' to open the menu: ")
-        print("user input: ", user_input)
-        if user_input == "m":
-            while True:
-                with print_lock:
-                    print("Menu Options:")
-                    print("Press l to control Door Light")
-                    print("Press b to control Door Buzzer")
-                    print("Press 'e' to exit the menu")
-                    user_input = input("Enter your choice: ")
-                    if user_input == "l":
-                        run_dl_threads(settings, threads, stop_event)
-                        time.sleep(1)
-                    elif user_input == "b":
-                        run_db_threads(settings, threads, stop_event)
-                        time.sleep(1)
-                    elif user_input == "e":
-                        print("Exiting the menu. Printing is resumed.")
-                        break
-        else:
-            pass
-def run_menu_thread(threads, stop_event):
-    thread = threading.Thread(target = menu, args=(stop_event,))
-    thread.start()
-    threads.append(thread)
-
 if __name__ == "__main__":
     print('Starting app')
     settings = load_settings('settingspi2.json')
@@ -98,7 +70,6 @@ if __name__ == "__main__":
         run_dus_threads(settings, threads, stop_event)
         run_gsc_threads(settings, threads,  stop_event)
         run_lcd_threads(settings,threads,stop_event)
-        run_menu_thread(threads, stop_event)
 
         while True:
             
