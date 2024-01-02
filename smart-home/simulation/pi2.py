@@ -37,7 +37,7 @@ def run_pir_threads(settings, threads, stop_event):
 def run_dpir_threads(settings, threads, stop_event):
     dpir2_settings = settings['DPIR2']
 
-    run_dpir(dpir2_settings, threads, stop_event)
+    run_pir(dpir2_settings, threads, stop_event)
 
 def run_ds_threads(settings, threads, stop_event):
     ds2_settings = settings['DS2']
@@ -48,7 +48,7 @@ def run_dus_threads(settings, threads, stop_event):
     run_dus(dus2_settings, threads, stop_event)
 
 def run_gsc_threads(settings, threads, stop_event):
-    db_settings = settings["GSC"]
+    db_settings = settings["GSG"]
     run_gsc(db_settings, threads, stop_event)
 
 def run_lcd_threads(settings, threads, stop_event):

@@ -42,6 +42,7 @@ def save_to_db(topic, data):
     elif topic == 'dus':
         write_dus(write_api, data)
     elif topic == 'pir':
+        query_data = []
         if data['name'] == 'DPIR1':
             query = f"""from(bucket: "{bucket}")
             |> range(start: -30s)
@@ -49,16 +50,22 @@ def save_to_db(topic, data):
             |> filter(fn: (r) => r["name"] == "DUS1")
             |> limit(n: 2)"""
             query_data = handle_influx_query(query)
-            is_entering = False
-            if len(query_data['data']) != 0:
-                if query_data['data'][0]['_value'] > query_data['data'][1]['_value']:
-                    is_entering = True
-                if is_entering:
-                    users_inside += 1
-                else:
-                    users_inside -= 1
             publish.single('dpir1-light-on', json.dumps({'light':'on'}), hostname=HOSTNAME, port=PORT)
-        
+        elif data['name'] == 'DPIR2':
+            query = f"""from(bucket: "{bucket}")
+            |> range(start: -30s)
+            |> filter(fn: (r) => r._measurement == "Distance")
+            |> filter(fn: (r) => r["name"] == "DUS2")
+            |> limit(n: 2)"""
+            query_data = handle_influx_query(query)
+        is_entering = False
+        if len(query_data['data']) != 0:
+            if query_data['data'][0]['_value'] > query_data['data'][1]['_value']:
+                is_entering = True
+            if is_entering:
+                users_inside += 1
+            else:
+                users_inside -= 1
         write_pir(write_api, data)
     elif topic == 'db':
         write_db(write_api, data)
