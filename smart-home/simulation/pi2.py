@@ -57,12 +57,13 @@ def run_lcd_threads(settings, threads, stop_event, msg):
     run_lcd(db_settings, threads, stop_event, msg)
 
 def handle_message(topic, data):
-    print("cao legendo")
+
     if topic == 'dht-lcd-display':
-        temperature_str = data.payload.decode('utf-8')
-        print(temperature_str)
+        temperature_str = data["temperature"]
         run_lcd_threads(settings,threads, stop_event, temperature_str)
 
+def on_message(client, userdata, msg):
+    handle_message(msg.topic, json.loads(msg.payload.decode('utf-8')))
 if __name__ == "__main__":
     # MQTT Configuration
     settings = load_settings('settingspi2.json')
@@ -70,17 +71,19 @@ if __name__ == "__main__":
     stop_event = threading.Event()
     pause_event = threading.Event()
     mqtt_client = mqtt.Client()
-    mqtt_client.connect("localhost", 1883, 60)
-    mqtt_client.loop_start()
+
 
 
     def on_connect(client, userdata, flags, rc):
+
         client.subscribe("dht-lcd-display")
 
 
     mqtt_client.on_connect = on_connect
-    mqtt_client.on_message = lambda client, userdata, msg: handle_message(msg.topic,
-                                                                          json.loads(msg.payload.decode('utf-8')))
+    mqtt_client.on_message = on_message
+
+    mqtt_client.connect("localhost", 1883, 60)
+    mqtt_client.loop_start()
 
     print('Starting app')
 

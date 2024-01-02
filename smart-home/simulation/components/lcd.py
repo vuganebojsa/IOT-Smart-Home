@@ -34,6 +34,7 @@ def lcd_callback(result, settings, publish_event):
     adjusted_datetime = current_datetime - timedelta(hours=1)
 
     formatted_time = adjusted_datetime.isoformat()
+
     payload = {
             'measurement': 'Text',
             'simulated': settings['simulated'],

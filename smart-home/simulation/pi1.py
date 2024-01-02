@@ -104,6 +104,7 @@ if __name__ == "__main__":
     mqtt_client.loop_start()
 
     def on_connect(client, userdata, flags, rc):
+        print("cao")
         client.subscribe("dpir1-light-on")
 
 
