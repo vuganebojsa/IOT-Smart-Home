@@ -1,9 +1,33 @@
 from influxdb_client import Point
+from datetime import datetime, timedelta
 
 
 bucket_influx = "iot_smart_home"
 org_influx = "FTN"
 
+#data['name'], data['_time'], alarm_active, data['name'] + ' detected movement.'
+def write_alarm_query(write_api, name, time, alarm_status, reason, simulated):
+    current_datetime = datetime.now()
+
+    adjusted_datetime = current_datetime - timedelta(hours=1)
+
+    formatted_time = adjusted_datetime.isoformat()
+    value = 0
+    if alarm_status:
+        value = 1
+    
+    point = (
+        Point('Alarm')
+        .tag("simulated", simulated)
+        .tag("name", name)
+        .tag('timeOfActivation', time)
+        .tag('reason', reason)
+        .field("measurement", value)
+        .time(formatted_time)
+
+    )
+
+    write_api.write(bucket=bucket_influx, org=org_influx, record=point)
 
 def write_dht(write_api, data):
     point = (

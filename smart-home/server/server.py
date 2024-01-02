@@ -10,6 +10,8 @@ app = Flask(__name__)
 
 # InfluxDB Configuration
 users_inside = 0
+alarm_active = False
+system_active = False
 token = "EcAZXvlCfWV-82_y7iiWU-cWt-RQL3ghTR5BF15th1xKSBI8YE2k80LZSCG19YEIoANoKB3pjKA1Uw05GwuVLw=="
 org = "FTN"
 url = "http://localhost:8086"
@@ -32,6 +34,7 @@ def on_connect(client, userdata, flags, rc):
 
 def save_to_db(topic, data):
     global users_inside
+    global alarm_active
     write_api = influxdb_client.write_api(write_options=SYNCHRONOUS)
     if topic == 'dht':
         write_dht(write_api, data)
@@ -42,10 +45,17 @@ def save_to_db(topic, data):
     elif topic == 'dus':
         write_dus(write_api, data)
     elif topic == 'pir':
+        print(data['name'])
+        print(users_inside)
+        if 'RPIR' in data['name']:
+            if users_inside == 0:
+                alarm_active = True
+                write_alarm_query(write_api, data['name'], data['_time'], alarm_active, data['name'] + ' detected movement.', data['simulated'])
+            return
         query_data = []
         if data['name'] == 'DPIR1':
             query = f"""from(bucket: "{bucket}")
-            |> range(start: -30s)
+            |> range(start: -40s)
             |> filter(fn: (r) => r._measurement == "Distance")
             |> filter(fn: (r) => r["name"] == "DUS1")
             |> limit(n: 2)"""
@@ -53,19 +63,21 @@ def save_to_db(topic, data):
             publish.single('dpir1-light-on', json.dumps({'light':'on'}), hostname=HOSTNAME, port=PORT)
         elif data['name'] == 'DPIR2':
             query = f"""from(bucket: "{bucket}")
-            |> range(start: -30s)
+            |> range(start: -40s)
             |> filter(fn: (r) => r._measurement == "Distance")
             |> filter(fn: (r) => r["name"] == "DUS2")
             |> limit(n: 2)"""
             query_data = handle_influx_query(query)
         is_entering = False
-        if len(query_data['data']) != 0:
+        if len(query_data['data']) > 1:
             if query_data['data'][0]['_value'] > query_data['data'][1]['_value']:
                 is_entering = True
             if is_entering:
                 users_inside += 1
             else:
                 users_inside -= 1
+        if users_inside < 0:
+            users_inside = 0
         write_pir(write_api, data)
     elif topic == 'db':
         write_db(write_api, data)

@@ -113,7 +113,7 @@ if __name__ == "__main__":
     
     try:
         #run_dht_threads(settings, threads, stop_event)
-        #run_pir_threads(settings, threads, stop_event)
+        run_pir_threads(settings, threads, stop_event)
         run_dpir_threads(settings, threads, stop_event)
         #run_ds_threads(settings, threads, stop_event)
         run_dus_threads(settings, threads, stop_event)
