@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 
 dht_batch = []
 publish_data_counter = 0
-publish_data_limit = 1
+publish_data_limit = 0
 
 def publisher_task(event, dht_batch):
     global publish_data_counter, publish_data_limit
