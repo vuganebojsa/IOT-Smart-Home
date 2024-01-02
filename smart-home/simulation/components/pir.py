@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 
 dht_batch = []
 publish_data_counter = 0
-publish_data_limit = 5
+publish_data_limit = 0
 
 
 def publisher_task(event, pir_batch):
@@ -21,8 +21,8 @@ def publisher_task(event, pir_batch):
             local_pir_batch = pir_batch.copy()
             publish_data_counter = 0
             pir_batch.clear()
-        publish.multiple(local_pir_batch, hostname=HOSTNAME, port=PORT)
-        print(f'published {publish_data_limit} pir values')
+        publish.single(local_pir_batch[0][0], local_pir_batch[0][1], hostname=HOSTNAME, port=PORT)
+        print(f'published {len(local_pir_batch)} pir values')
         event.clear()
 
 def pir_callback(motion_detected, settings, publish_event):
@@ -54,7 +54,7 @@ publisher_thread.start()
 
 def run_pir(settings, threads, stop_event):
         if settings['simulated']:
-            pir_thread = threading.Thread(target = run_pir_simulator, args=(5, pir_callback, stop_event, settings, publish_event))
+            pir_thread = threading.Thread(target = run_pir_simulator, args=(15, pir_callback, stop_event, settings, publish_event))
             pir_thread.start()
             threads.append(pir_thread)
 

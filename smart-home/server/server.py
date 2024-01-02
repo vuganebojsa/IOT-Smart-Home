@@ -4,7 +4,7 @@ from influxdb_client.client.write_api import SYNCHRONOUS
 import paho.mqtt.client as mqtt
 import json
 from influx_writes import *
-
+import paho.mqtt.publish as publish
 app = Flask(__name__)
 
 
@@ -14,12 +14,10 @@ org = "FTN"
 url = "http://localhost:8086"
 bucket = "iot_smart_home"
 influxdb_client = InfluxDBClient(url=url, token=token, org=org)
-
+HOSTNAME = "localhost"
+PORT = 1883
 
 # MQTT Configuration
-mqtt_client = mqtt.Client()
-mqtt_client.connect("localhost", 1883, 60)
-mqtt_client.loop_start()
 
 def on_connect(client, userdata, flags, rc):
     client.subscribe("dht")
@@ -30,12 +28,8 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("db")
     client.subscribe("dl")
 
-mqtt_client.on_connect = on_connect
-mqtt_client.on_message = lambda client, userdata, msg: save_to_db(msg.topic, json.loads(msg.payload.decode('utf-8')))
-
 
 def save_to_db(topic, data):
-    print(data)
     write_api = influxdb_client.write_api(write_options=SYNCHRONOUS)
     if topic == 'dht':
         write_dht(write_api, data)
@@ -46,7 +40,9 @@ def save_to_db(topic, data):
     elif topic == 'dus':
         write_dus(write_api, data)
     elif topic == 'pir':
-        
+        if data['name'] == 'DPIR1':
+            publish.single('dpir1-light-on', json.dumps({'light':'on'}), hostname=HOSTNAME, port=PORT)
+            
         write_pir(write_api, data)
     elif topic == 'db':
         write_db(write_api, data)
@@ -73,9 +69,16 @@ def handle_influx_query(query):
 def retrieve_simple_data():
     query = f"""from(bucket: "{bucket}")
     |> range(start: -10m)
-    |> filter(fn: (r) => r._measurement == "Humidity")"""
+    |> filter(fn: (r) => r._measurement == "Light")"""
     return handle_influx_query(query)
 
 
 if __name__ == '__main__':
+    mqtt_client = mqtt.Client()
+    mqtt_client.connect("localhost", 1883, 60)
+    mqtt_client.loop_start()
+    
+    mqtt_client.on_connect = on_connect
+    mqtt_client.on_message = lambda client, userdata, msg: save_to_db(msg.topic, json.loads(msg.payload.decode('utf-8')))
+
     app.run(debug=True)

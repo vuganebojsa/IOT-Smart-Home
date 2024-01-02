@@ -87,7 +87,10 @@ def write_db(write_api, data):
     write_api.write(bucket=bucket_influx, org=org_influx, record=point)
 
 def write_dl(write_api, data):
-
+    if data['value'] == True:
+        data['value'] = 1
+    elif data['value'] == False:
+        data['value'] = 0
     if '_time' in data:
         point = (
             Point(data["measurement"])

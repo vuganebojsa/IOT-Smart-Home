@@ -5,13 +5,13 @@ from components.dht import run_dht
 from components.pir import run_pir
 from components.dus import run_dus
 import time
-from components.dpir import run_dpir
 from components.ds import run_ds
 from components.dms import run_dms
 from components.dl import run_dl
 from components.db import run_db
 from locks.print_lock import print_lock
-
+import paho.mqtt.client as mqtt
+import json
 try:
     import RPi.GPIO as GPIO
     GPIO.setmode(GPIO.BCM)
@@ -34,7 +34,7 @@ def run_pir_threads(settings, threads, stop_event):
 def run_dpir_threads(settings, threads, stop_event):
     dpir1_settings = settings['DPIR1']
 
-    run_dpir(dpir1_settings, threads, stop_event)
+    run_pir(dpir1_settings, threads, stop_event)
 
 def run_ds_threads(settings, threads, stop_event):
     ds1_settings = settings['DS1']
@@ -86,19 +86,38 @@ def run_menu_thread(threads, stop_event):
     thread.start()
     threads.append(thread)
 
+
+def handle_message(topic, data):
+    print(topic)
+    if topic == 'dpir1-light-on':
+         run_dl_threads(settings, threads, stop_event)
+
 if __name__ == "__main__":
-    print('Starting app')
+    # MQTT Configuration
     settings = load_settings('settingspi1.json')
     threads = []
     stop_event = threading.Event()
     pause_event = threading.Event()
+    mqtt_client = mqtt.Client()
+    mqtt_client.connect("localhost", 1883, 60)
+    mqtt_client.loop_start()
+
+    def on_connect(client, userdata, flags, rc):
+        client.subscribe("dpir1-light-on")
+
+
+    mqtt_client.on_connect = on_connect
+    mqtt_client.on_message = lambda client, userdata, msg: handle_message(msg.topic, json.loads(msg.payload.decode('utf-8')))
+
+    print('Starting app')
+    
     try:
-        run_dht_threads(settings, threads, stop_event)
-        run_pir_threads(settings, threads, stop_event)
+        #run_dht_threads(settings, threads, stop_event)
+        #run_pir_threads(settings, threads, stop_event)
         run_dpir_threads(settings, threads, stop_event)
-        run_ds_threads(settings, threads, stop_event)
-        run_dus_threads(settings, threads, stop_event)
-        run_dms_threads(settings, threads, stop_event)
+        #run_ds_threads(settings, threads, stop_event)
+        #run_dus_threads(settings, threads, stop_event)
+        #run_dms_threads(settings, threads, stop_event)
         #run_menu_thread(threads, stop_event)
         while True:
             

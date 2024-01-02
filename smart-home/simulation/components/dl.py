@@ -11,8 +11,7 @@ from datetime import datetime, timedelta
 
 dht_batch = []
 publish_data_counter = 0
-publish_data_limit = 5
-result = True
+publish_data_limit = 1
 
 def publisher_task(event, dht_batch):
     global publish_data_counter, publish_data_limit
@@ -28,14 +27,7 @@ def publisher_task(event, dht_batch):
 
 
 def dl_callback(settings, publish_event):
-    global result
     global publish_data_counter, publish_data_limit
-
-
-    if result:
-        result = False
-    else:
-        result = True
     current_datetime = datetime.now()
 
     adjusted_datetime = current_datetime - timedelta(hours=1)
@@ -46,9 +38,28 @@ def dl_callback(settings, publish_event):
         'simulated': settings['simulated'],
         'runs_on': settings['runs_on'],
         'name': settings['name'],
-        'value': result,
+        'value': 1,
         '_time': formatted_time
     }
+    with print_lock:
+        dht_batch.append(('dl', json.dumps(payload), 0, True))
+        publish_data_counter += 1
+    time.sleep(10)
+    current_datetime = datetime.now()
+
+    adjusted_datetime = current_datetime - timedelta(hours=1)
+
+    formatted_time = adjusted_datetime.isoformat()
+    payload = {
+        'measurement': 'Light',
+        'simulated': settings['simulated'],
+        'runs_on': settings['runs_on'],
+        'name': settings['name'],
+        'value': 0,
+        '_time': formatted_time
+    }
+    print('door light is OFF')
+
     with print_lock:
         dht_batch.append(('dl', json.dumps(payload), 0, True))
         publish_data_counter += 1

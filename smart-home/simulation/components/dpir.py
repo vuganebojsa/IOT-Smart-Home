@@ -9,7 +9,7 @@ from broker_settings import HOSTNAME, PORT
 import json
 dht_batch = []
 publish_data_counter = 0
-publish_data_limit = 5
+publish_data_limit = 0
 
 
 def publisher_task(event, pir_batch):
@@ -21,7 +21,7 @@ def publisher_task(event, pir_batch):
             publish_data_counter = 0
             pir_batch.clear()
         publish.multiple(local_pir_batch, hostname=HOSTNAME, port=PORT)
-        print(f'published {publish_data_limit} dpir values')
+        print(f'published {len(local_pir_batch)} dpir values')
         event.clear()
 
 def dpir_callback(motion_detected, settings, publish_event):
@@ -54,7 +54,7 @@ publisher_thread.start()
 def run_dpir(settings, threads, stop_event):
         if settings['simulated']:
             dpir_thread = threading.Thread(target=run_dpir_simulator,
-                                          args=(5, dpir_callback, stop_event, settings, publish_event))
+                                          args=(10, dpir_callback, stop_event, settings, publish_event))
             dpir_thread.start()
             threads.append(dpir_thread)
         else:
