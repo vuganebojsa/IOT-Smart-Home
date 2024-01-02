@@ -125,3 +125,15 @@ def write_dl(write_api, data):
             .time(data['_time'])
         )
         write_api.write(bucket=bucket_influx, org=org_influx, record=point)
+
+def write_gsg(write_api, data):
+    point = (
+        Point(data["measurement"])
+        .tag("simulated", data["simulated"])
+        .tag("runs_on", data["runs_on"])
+        .tag("name", data["name"])
+        .tag('_time', data['_time'])
+        .field("measurement", data["value"])
+        .time(data['_time'])
+    )
+    write_api.write(bucket=bucket_influx, org=org_influx, record=point)

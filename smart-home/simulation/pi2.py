@@ -10,7 +10,7 @@ from components.ds import run_ds
 from components.dms import run_dms
 from components.dl import run_dl
 from components.db import run_db
-from components.gsc import run_gsc
+from components.gsg import run_gsg
 from components.lcd import run_lcd
 
 from locks.print_lock import print_lock
@@ -49,7 +49,7 @@ def run_dus_threads(settings, threads, stop_event):
 
 def run_gsc_threads(settings, threads, stop_event):
     db_settings = settings["GSG"]
-    run_gsc(db_settings, threads, stop_event)
+    run_gsg(db_settings, threads, stop_event)
 
 def run_lcd_threads(settings, threads, stop_event):
     db_settings = settings["GLCD"]

@@ -30,6 +30,7 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("pir")
     client.subscribe("db")
     client.subscribe("dl")
+    client.subscribe("gsg")
 
 
 def save_to_db(topic, data):
@@ -45,8 +46,6 @@ def save_to_db(topic, data):
     elif topic == 'dus':
         write_dus(write_api, data)
     elif topic == 'pir':
-        print(data['name'])
-        print(users_inside)
         if 'RPIR' in data['name']:
             if users_inside == 0:
                 alarm_active = True
@@ -83,6 +82,11 @@ def save_to_db(topic, data):
         write_db(write_api, data)
     elif topic == 'dl':
         write_dl(write_api, data)
+    elif topic == 'gsg':
+        if data['suspicious'] is not None and data['suspicious'] == True:
+            alarm_active = True
+            write_alarm_query(write_api, data['name'], data['_time'], alarm_active, data['name'] + ' detected unusual values.', data['simulated'])
+        write_gsg(write_api, data)
 
 def handle_influx_query(query):
     try:
