@@ -15,7 +15,6 @@ def write_dht(write_api, data):
         .time(data['_time'])
 
     )
-    print("Constructed Point:", point)  # Add this line for debugging
 
     write_api.write(bucket=bucket_influx, org=org_influx, record=point)
     point = (
