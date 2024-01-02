@@ -3,66 +3,95 @@
     padding: 0;
 }
 .family{
-    height: 346px;
+    height: 350px;
     width: 800px;
-    background-image: url('../../../favicon.ico');
-    background-size: cover;
+    background-image: url('../../../assets/familyroom.jpg');
+    background-size: 100% 100%;
 }
 .dinette{
     height: 350px;
-    width: 496px;
+    width: 497px;
+    background-image: url('../../../assets/dinette.jpg');
+    background-size: 100% 100%;
 }
 .stairs{
     height: 200px;
     width: 510px;
+    background-image: url('../../../assets/stairs.jpg');
+    background-size: 100% 100%;
 }
 .kitchen{
     height: 200px;
     width: 706px;
+    background-image: url('../../../assets/kitchen.jpg');
+    background-size: 100% 100%;
 }
 .pantry{
     height: 200px;
-    width: 80px;
+    width: 81px;
+    background-image: url('../../../assets/pantry.jpg');
+    background-size: 100% 100%;
 }
 .ownerssuite{
     width:850px;
     height: 250px;
+    background-image: url('../../../assets/ownerssuite.jpg');
+    background-size: 100% 100%;
 }
 .wic{
     width: 316px;
     height: 300px;
+    background-image: url('../../../assets/wic.jpg');
+    background-size: 100% 100%;
 }
 .obath{
     width: 330px;
     height: 300px;
+    background-image: url('../../../assets/obath.jpg');
+    background-size: 100% 100%;
 }
 .bedroom3{
     width: 550px;
     height: 250px;
+    background-image: url('../../../assets/bedroom3.jpg');
+    background-size: 100% 100%;
 }
 .bath{
     height: 150px;
     width: 550px;
+    background-image: url('../../../assets/bath.jpg');
+    background-size: 100% 100%;
 }
 .bedroom2{
     width: 550px;
     height: 550px;
+    background-image: url('../../../assets/bedroom2.jpg');
+    background-size: 100% 100%;
 }
 .foyer{
     width:310px ;
     height: 600px;
+    background-image: url('../../../assets/foyer.jpg');
+    background-size: 100% 100%;
 }
 .lndry{
     width: 338px;
     height: 600px;
+    background-image: url('../../../assets/lndry.jpg');
+    background-size: 100% 100%;
 }
 .coveredporch{
     width: 650px;
     height: 150px;
+    background-image: url('../../../assets/coveredporch.jpg');
+    background-size: 100% 100%;
 }
 .garage{
     width:800px;
     height:800px;
+    background-image: url('../../../assets/garage.jpg');
+    background-size: 100% 100%;
+
 }
 
 .family, .dinette, .stairs, .kitchen, .pantry, .ownerssuite,
