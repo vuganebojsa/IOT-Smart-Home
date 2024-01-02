@@ -46,6 +46,7 @@ def save_to_db(topic, data):
     elif topic == 'dus':
         write_dus(write_api, data)
     elif topic == 'pir':
+        
         write_pir(write_api, data)
     elif topic == 'db':
         write_db(write_api, data)

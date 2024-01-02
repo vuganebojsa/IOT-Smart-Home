@@ -11,7 +11,7 @@ def run_light(pin, callback, stop_event, settings, publish_event):
     GPIO.setup(pin, GPIO.OUT)
     callback(settings, publish_event)
     GPIO.output(pin, GPIO.HIGH)
-    time.sleep(1)
+    time.sleep(10)
     callback(settings, publish_event)
     GPIO.output(pin, GPIO.LOW)
 
