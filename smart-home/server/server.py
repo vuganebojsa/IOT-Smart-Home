@@ -9,6 +9,7 @@ app = Flask(__name__)
 
 
 # InfluxDB Configuration
+users_inside = 0
 token = "EcAZXvlCfWV-82_y7iiWU-cWt-RQL3ghTR5BF15th1xKSBI8YE2k80LZSCG19YEIoANoKB3pjKA1Uw05GwuVLw=="
 org = "FTN"
 url = "http://localhost:8086"
@@ -30,6 +31,7 @@ def on_connect(client, userdata, flags, rc):
 
 
 def save_to_db(topic, data):
+    global users_inside
     write_api = influxdb_client.write_api(write_options=SYNCHRONOUS)
     if topic == 'dht':
         write_dht(write_api, data)
@@ -41,14 +43,27 @@ def save_to_db(topic, data):
         write_dus(write_api, data)
     elif topic == 'pir':
         if data['name'] == 'DPIR1':
+            query = f"""from(bucket: "{bucket}")
+            |> range(start: -30s)
+            |> filter(fn: (r) => r._measurement == "Distance")
+            |> filter(fn: (r) => r["name"] == "DUS1")
+            |> limit(n: 2)"""
+            query_data = handle_influx_query(query)
+            is_entering = False
+            if len(query_data['data']) != 0:
+                if query_data['data'][0]['_value'] > query_data['data'][1]['_value']:
+                    is_entering = True
+                if is_entering:
+                    users_inside += 1
+                else:
+                    users_inside -= 1
             publish.single('dpir1-light-on', json.dumps({'light':'on'}), hostname=HOSTNAME, port=PORT)
-            
+        
         write_pir(write_api, data)
     elif topic == 'db':
         write_db(write_api, data)
     elif topic == 'dl':
         write_dl(write_api, data)
-
 
 def handle_influx_query(query):
     try:
@@ -60,9 +75,9 @@ def handle_influx_query(query):
             for record in table.records:
                 container.append(record.values)
 
-        return jsonify({"status": "success", "data": container})
+        return {"status": "success", "data": container}
     except Exception as e:
-        return jsonify({"status": "error", "message": str(e)})
+        return {"status": "error", "message": str(e)}
 
 
 @app.route('/simple_query', methods=['GET'])
