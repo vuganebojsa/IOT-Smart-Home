@@ -12,7 +12,7 @@ app = Flask(__name__)
 users_inside = 0
 alarm_active = False
 system_active = False
-token = "EcAZXvlCfWV-82_y7iiWU-cWt-RQL3ghTR5BF15th1xKSBI8YE2k80LZSCG19YEIoANoKB3pjKA1Uw05GwuVLw=="
+token = "en1PQdEjc5Mqqct6lrc7lCO_7EDQc2auk6GMMKykVFMIPyD0gBPVE1UYj92RPW9h9mrKwzqR0QN6-iLttvJDGg=="
 org = "FTN"
 url = "http://localhost:8086"
 bucket = "iot_smart_home"
@@ -37,6 +37,10 @@ def save_to_db(topic, data):
     global alarm_active
     write_api = influxdb_client.write_api(write_options=SYNCHRONOUS)
     if topic == 'dht':
+
+        if data['name'] == 'GDHT':
+
+            publish.single('dht-lcd-display', str(data["value_temperature"]), hostname=HOSTNAME, port=PORT)
         write_dht(write_api, data)
     elif topic == 'dms':
         write_dms(write_api, data)
