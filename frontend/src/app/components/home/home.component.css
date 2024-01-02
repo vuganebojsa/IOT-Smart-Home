@@ -93,11 +93,14 @@
     background-size: 100% 100%;
 
 }
-
-.family, .dinette, .stairs, .kitchen, .pantry, .ownerssuite,
-    .wic, .obath, .bedroom3, .bath, .bedroom2, .foyer, .lndry,
-    .coveredporch, .garage {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+.sensors{ 
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+    position: relative;
+}
+.sensors:hover{
+    cursor: pointer;
+    color: rgb(213, 50, 50);
+    transition: .3s ease-in-out;
+}
