@@ -33,11 +33,11 @@ def display(message):
 
 
 
-def run_lcd_loop(delay, callback, stop_event, settings, publish_event):
+def run_lcd_loop(delay, callback, stop_event, settings, publish_event, msg):
     mcp.output(3, 1)  # turn on LCD backlight
     lcd.begin(16, 2)  # set number of LCD lines and columns
     while True:
-        message = lcd.message
+        message = msg
         callback(message, settings, publish_event)
         if stop_event.is_set():
             break

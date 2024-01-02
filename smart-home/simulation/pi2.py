@@ -12,7 +12,8 @@ from components.dl import run_dl
 from components.db import run_db
 from components.gsc import run_gsc
 from components.lcd import run_lcd
-
+import paho.mqtt.client as mqtt
+import json
 from locks.print_lock import print_lock
 
 try:
@@ -51,17 +52,38 @@ def run_gsc_threads(settings, threads, stop_event):
     db_settings = settings["GSG"]
     run_gsc(db_settings, threads, stop_event)
 
-def run_lcd_threads(settings, threads, stop_event):
+def run_lcd_threads(settings, threads, stop_event, msg):
     db_settings = settings["GLCD"]
-    run_lcd(db_settings, threads, stop_event)
+    run_lcd(db_settings, threads, stop_event, msg)
 
+def handle_message(topic, data):
+    print("cao legendo")
+    if topic == 'dht-lcd-display':
+        temperature_str = data.payload.decode('utf-8')
+        print(temperature_str)
+        run_lcd_threads(settings,threads, stop_event, temperature_str)
 
 if __name__ == "__main__":
-    print('Starting app')
+    # MQTT Configuration
     settings = load_settings('settingspi2.json')
     threads = []
     stop_event = threading.Event()
     pause_event = threading.Event()
+    mqtt_client = mqtt.Client()
+    mqtt_client.connect("localhost", 1883, 60)
+    mqtt_client.loop_start()
+
+
+    def on_connect(client, userdata, flags, rc):
+        client.subscribe("dht-lcd-display")
+
+
+    mqtt_client.on_connect = on_connect
+    mqtt_client.on_message = lambda client, userdata, msg: handle_message(msg.topic,
+                                                                          json.loads(msg.payload.decode('utf-8')))
+
+    print('Starting app')
+
     try:
         run_dht_threads(settings, threads, stop_event)
         run_pir_threads(settings, threads, stop_event)
@@ -69,7 +91,7 @@ if __name__ == "__main__":
         run_ds_threads(settings, threads, stop_event)
         run_dus_threads(settings, threads, stop_event)
         run_gsc_threads(settings, threads,  stop_event)
-        run_lcd_threads(settings,threads,stop_event)
+        # run_lcd_threads(settings,threads,stop_event)
 
         while True:
             

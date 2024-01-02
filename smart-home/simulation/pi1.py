@@ -92,6 +92,7 @@ def handle_message(topic, data):
     if topic == 'dpir1-light-on':
          run_dl_threads(settings, threads, stop_event)
 
+
 if __name__ == "__main__":
     # MQTT Configuration
     settings = load_settings('settingspi1.json')
