@@ -1,0 +1,74 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+.family{
+    height: 346px;
+    width: 800px;
+    background-image: url('../../../favicon.ico');
+    background-size: cover;
+}
+.dinette{
+    height: 350px;
+    width: 496px;
+}
+.stairs{
+    height: 200px;
+    width: 510px;
+}
+.kitchen{
+    height: 200px;
+    width: 706px;
+}
+.pantry{
+    height: 200px;
+    width: 80px;
+}
+.ownerssuite{
+    width:850px;
+    height: 250px;
+}
+.wic{
+    width: 316px;
+    height: 300px;
+}
+.obath{
+    width: 330px;
+    height: 300px;
+}
+.bedroom3{
+    width: 550px;
+    height: 250px;
+}
+.bath{
+    height: 150px;
+    width: 550px;
+}
+.bedroom2{
+    width: 550px;
+    height: 550px;
+}
+.foyer{
+    width:310px ;
+    height: 600px;
+}
+.lndry{
+    width: 338px;
+    height: 600px;
+}
+.coveredporch{
+    width: 650px;
+    height: 150px;
+}
+.garage{
+    width:800px;
+    height:800px;
+}
+
+.family, .dinette, .stairs, .kitchen, .pantry, .ownerssuite,
+    .wic, .obath, .bedroom3, .bath, .bedroom2, .foyer, .lndry,
+    .coveredporch, .garage {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
