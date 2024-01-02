@@ -43,6 +43,7 @@ def lcd_callback(result, settings, publish_event):
             'value': result,
             '_time': formatted_time
     }
+    print(payload)
     with print_lock:
         dht_batch.append(('lcd', json.dumps(payload), 0, True))
         publish_data_counter += 1
