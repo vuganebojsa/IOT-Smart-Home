@@ -3,6 +3,7 @@ import threading
 from settings import load_settings
 from components.dht import run_dht
 from components.pir import run_pir
+from components.bir import run_bir
 import time
 from components.db import run_db
 from locks.print_lock import print_lock
@@ -25,7 +26,7 @@ def run_pir_threads(settings, threads, stop_event):
 def run_bir_threads(settings, threads, stop_event):
     bir_settings = settings['BIR']
 
-    #run_dpir(bir_settings, threads, stop_event)
+    run_bir(bir_settings, threads, stop_event)
 
 def run_bb_threads(settings, threads, stop_event):
     db_settings = settings["BB"]

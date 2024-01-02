@@ -51,7 +51,7 @@ publisher_thread = threading.Thread(target=publisher_task, args=(publish_event, 
 publisher_thread.daemon = True
 publisher_thread.start()
 
-def run_dpir(settings, threads, stop_event):
+def run_bir(settings, threads, stop_event):
         if settings['simulated']:
             dpir_thread = threading.Thread(target=run_bir_simulator,
                                           args=(5, bir_callback, stop_event, settings, publish_event))
