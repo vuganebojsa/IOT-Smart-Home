@@ -7,6 +7,8 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { HomeComponent } from './components/home/home.component';
 import { AlarmClockComponent } from './components/alarm-clock/alarm-clock.component';
 import { HouseAlarmComponent } from './components/house-alarm/house-alarm.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import {NgxMaterialTimepickerModule} from 'ngx-material-timepicker';
 
 @NgModule({
   declarations: [
@@ -18,7 +20,9 @@ import { HouseAlarmComponent } from './components/house-alarm/house-alarm.compon
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    BrowserAnimationsModule,
+    NgxMaterialTimepickerModule
   ],
   providers: [],
   bootstrap: [AppComponent]
