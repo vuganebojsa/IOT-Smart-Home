@@ -10,13 +10,19 @@ export class AlarmClockComponent {
 
   constructor(private snackBar:SnackbarService, private httpClient: HttpClient) {}
   selectedTime: string = '';
+  errorMessage = false;
   onTimeSet(event: any) {
     console.log('Selected time:', event);
     this.selectedTime = event
-    
+    this.errorMessage = false
     
   }
   onSetAlarmClick() {
+    if (this.selectedTime == ''){
+      this.errorMessage = true
+      return
+    }
+    
     const alarmTime = this.selectedTime;
   
     // Postavite URL vašeg Flask servera
