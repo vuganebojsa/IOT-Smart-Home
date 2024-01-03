@@ -6,7 +6,12 @@ import json
 from influx_writes import *
 import paho.mqtt.publish as publish
 app = Flask(__name__)
-
+@app.after_request
+def add_cors_headers(response):
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+    response.headers['Access-Control-Allow-Methods'] = 'OPTIONS, HEAD, GET, POST, PUT, DELETE'
+    return response
 
 # InfluxDB Configuration
 users_inside = 0
@@ -117,15 +122,14 @@ def handle_influx_query(query):
 
 @app.route('/measurement/<string:name>/<string:devicename>', methods=['GET'])
 def get_last_measurement_data(name, devicename):
-    print(name)
 
-    print(name)
     if name == 'dht':
-
+        values = []
         query = f"""from(bucket: "{bucket}")
-        |> range(start: -5m)
+        |> range(start: -25m)
         |> filter(fn: (r) => r._measurement == "Temperature")
         |> filter(fn: (r) => r["name"] == "{devicename}")
+        |> sort(columns: ["_time"], desc: true)
         |> limit(n: 1)
         """
         temperature = handle_influx_query(query)
@@ -133,9 +137,10 @@ def get_last_measurement_data(name, devicename):
             if len(temperature['data']) > 0:
                 values.append(temperature['data'][0])
         query = f"""from(bucket: "{bucket}")
-        |> range(start: -5m)
+        |> range(start: -25m)
         |> filter(fn: (r) => r._measurement == "Humidity")
         |> filter(fn: (r) => r["name"] == "{devicename}")
+        |> sort(columns: ["_time"], desc: true)
         |> limit(n: 1)
         """
         humidity = handle_influx_query(query)
@@ -145,10 +150,12 @@ def get_last_measurement_data(name, devicename):
         return values
 
     elif name == 'gyro':
+        values = []
         query = f"""from(bucket: "{bucket}")
-        |> range(start: -5m)
+        |> range(start: -25m)
         |> filter(fn: (r) => r._measurement == "Accelerator")
         |> filter(fn: (r) => r["name"] == "{devicename}")
+        |> sort(columns: ["_time"], desc: true)
         |> limit(n: 1)
         """
         accelerator = handle_influx_query(query)
@@ -156,22 +163,25 @@ def get_last_measurement_data(name, devicename):
             if len(accelerator['data']) > 0:
                 values.append(accelerator['data'][0])
         query = f"""from(bucket: "{bucket}")
-        |> range(start: -5m)
+        |> range(start: -25m)
         |> filter(fn: (r) => r._measurement == "Gyroscope")
         |> filter(fn: (r) => r["name"] == "{devicename}")
+        |> sort(columns: ["_time"], desc: true)
         |> limit(n: 1)
         """
         gyroscope = handle_influx_query(query)
         if 'error' not in gyroscope:
             if len(gyroscope['data']) > 0:
                 values.append(gyroscope['data'][0])
+        
         return values
 
     else:
         query = f"""from(bucket: "{bucket}")
-        |> range(start: -5m)
+        |> range(start: -25m)
         |> filter(fn: (r) => r._measurement == "{name}")
         |> filter(fn: (r) => r["name"] == "{devicename}")
+        |> sort(columns: ["_time"], desc: true)
         |> limit(n: 1)
         """
         values = handle_influx_query(query)

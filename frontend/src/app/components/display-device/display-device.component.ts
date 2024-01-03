@@ -36,6 +36,7 @@ export class DisplayDeviceComponent implements OnInit{
     else if(this.name == 'RPIR3') return 'Motion';
     else if(this.name == 'RPIR4') return 'Motion';
     else if(this.name == 'RDHT4') return 'dht';
+    else if(this.name == 'RDHT3') return 'dht';
     else if(this.name == 'BB') return 'Buzz';
     else if(this.name == 'B4SD') return 'B4SD Time';
     else if(this.name == 'BIR') return 'Motion';
