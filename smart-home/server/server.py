@@ -23,13 +23,16 @@ PORT = 1883
 # MQTT Configuration
 
 def on_connect(client, userdata, flags, rc):
-    client.subscribe("dht")
-    client.subscribe("dms")
-    client.subscribe("ds")
-    client.subscribe("dus")
-    client.subscribe("pir")
-    client.subscribe("db")
-    client.subscribe("dl")
+
+    client.subscribe("dht", qos=1)
+    client.subscribe("dms", qos=1)
+    client.subscribe("ds", qos=1)
+    client.subscribe("dus", qos=1)
+    client.subscribe("pir", qos=1)
+    client.subscribe("db", qos=1)
+    client.subscribe("dl", qos=1)
+    client.subscribe("lcd", qos=1)
+
 
 
 def save_to_db(topic, data):
@@ -40,7 +43,7 @@ def save_to_db(topic, data):
 
         if data['name'] == 'GDHT':
             dht_message = "humidity: " + str(data["value_humidity"]) + ", " + "temperature: " + str(data["value_temperature"])
-            print(dht_message)
+
             publish.single('dht-lcd-display', json.dumps({'temperature':dht_message}), hostname=HOSTNAME, port=PORT)
         write_dht(write_api, data)
     elif topic == 'dms':
@@ -50,8 +53,7 @@ def save_to_db(topic, data):
     elif topic == 'dus':
         write_dus(write_api, data)
     elif topic == 'pir':
-        print(data['name'])
-        print(users_inside)
+
         if 'RPIR' in data['name']:
             if users_inside == 0:
                 alarm_active = True
@@ -88,6 +90,9 @@ def save_to_db(topic, data):
         write_db(write_api, data)
     elif topic == 'dl':
         write_dl(write_api, data)
+    elif topic == 'lcd':
+
+        write_db(write_api, data)
 
 def handle_influx_query(query):
     try:
@@ -120,4 +125,4 @@ if __name__ == '__main__':
     mqtt_client.on_connect = on_connect
     mqtt_client.on_message = lambda client, userdata, msg: save_to_db(msg.topic, json.loads(msg.payload.decode('utf-8')))
 
-    app.run(debug=True)
+    app.run(debug=False)
