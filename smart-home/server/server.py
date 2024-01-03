@@ -5,7 +5,11 @@ import paho.mqtt.client as mqtt
 import json
 from influx_writes import *
 import paho.mqtt.publish as publish
+from flask_cors import CORS
+
+
 app = Flask(__name__)
+CORS(app)
 
 
 # InfluxDB Configuration
@@ -141,6 +145,16 @@ def retrieve_simple_data():
     |> filter(fn: (r) => r._measurement == "Light")"""
     return handle_influx_query(query)
 
+@app.route('/set_alarm', methods=['POST'])
+def set_alarm():
+    try:
+        data = request.get_json()
+        alarm_time = data.get("alarm_time")
+        print(f"Postavljen alarm za: {alarm_time}")
+
+        return jsonify({"message": "Alarm set successfully"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     mqtt_client = mqtt.Client()
