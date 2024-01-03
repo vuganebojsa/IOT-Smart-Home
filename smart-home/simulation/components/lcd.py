@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 
 import paho.mqtt.publish as publish
 from broker_settings import HOSTNAME, PORT
+
 import json
 dht_batch = []
 publish_data_counter = 0
@@ -33,6 +34,7 @@ def lcd_callback(result, settings, publish_event):
     adjusted_datetime = current_datetime - timedelta(hours=1)
 
     formatted_time = adjusted_datetime.isoformat()
+
     payload = {
             'measurement': 'Text',
             'simulated': settings['simulated'],
@@ -52,16 +54,16 @@ publisher_thread = threading.Thread(target=publisher_task, args=(publish_event, 
 publisher_thread.daemon = True
 publisher_thread.start()
 
-def run_lcd(settings, threads, stop_event):
+def run_lcd(settings, threads, stop_event, msg):
         if settings['simulated']:
-            lcd_thread = threading.Thread(target = run_lcd_simulator, args=(5, lcd_callback, stop_event, settings, publish_event))
+            lcd_thread = threading.Thread(target = run_lcd_simulator, args=(6, lcd_callback, stop_event, settings, publish_event, msg))
             lcd_thread.start()
             threads.append(lcd_thread)
         else:
-            from sensors.lcd import detect_motion
+            from sensors.lcd.LCD1602 import run_lcd_loop
             sda = settings['SDA']
             scl = settings['SCL']
 
-            pir_thread = threading.Thread(target=detect_motion, args=(sda, scl, lcd_callback, stop_event, settings, publish_event))
+            pir_thread = threading.Thread(target=run_lcd_loop, args=(lcd_callback, stop_event, settings, publish_event, msg))
             pir_thread.start()
             threads.append(pir_thread)
