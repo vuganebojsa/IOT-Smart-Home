@@ -12,7 +12,8 @@ app = Flask(__name__)
 users_inside = 0
 alarm_active = False
 system_active = False
-token = "g7NJVRHodhza0U5BLCtEnqBxbWiwBYh_a-6MndQ6DQFCHqISWhI6TlqlHZ9s586yoTrbR-026oIUzeRD3jLt3A=="
+alarm_active_button = False
+token = "kw71CyjVbIlWpLtIXqWBTAnKGGKgOeT4UANgRNdnJOZJsT0k70IUXAQG0JXV_nqyk8-PpVdaAKEfM3CvkYTa7A=="
 org = "FTN"
 url = "http://localhost:8086"
 bucket = "iot_smart_home"
@@ -41,6 +42,7 @@ def on_connect(client, userdata, flags, rc):
 def save_to_db(topic, data):
     global users_inside
     global alarm_active
+    global  alarm_active_button
     write_api = influxdb_client.write_api(write_options=SYNCHRONOUS)
     if topic == 'dht':
 
@@ -52,6 +54,21 @@ def save_to_db(topic, data):
     elif topic == 'dms':
         write_dms(write_api, data)
     elif topic == 'ds':
+        if data['alarm'] is not None and data['alarm'] == True:
+            if alarm_active_button != True:
+                print("UKLJUCIO")
+                alarm_active = True
+                alarm_active_button = True
+                write_alarm_query(write_api, data['name'], data['_time'], alarm_active,
+                              "Button is not pressed for more than 5 seconds", data['simulated'])
+        elif data['alarm'] is not None and data['alarm'] == False:
+            if alarm_active_button != False:
+                print("ISKLJUCIO")
+                alarm_active = False
+                alarm_active_button = False
+                write_alarm_query(write_api, data['name'], data['_time'], alarm_active,
+                                  "Button is not pressed anymore", data['simulated'])
+        print(alarm_active)
         write_ds(write_api, data)
     elif topic == 'dus':
         write_dus(write_api, data)
@@ -59,6 +76,7 @@ def save_to_db(topic, data):
         if 'RPIR' in data['name']:
             if users_inside == 0:
                 alarm_active = True
+
                 write_alarm_query(write_api, data['name'], data['_time'], alarm_active, data['name'] + ' detected movement.', data['simulated'])
             return
         query_data = []
