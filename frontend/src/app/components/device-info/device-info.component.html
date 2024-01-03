@@ -4,13 +4,31 @@
     </div>
 </div>
 
-<div class="row mx-2">
-    <h5>Measurements</h5>
-    <div class="col-6" *ngFor="let measure of measurements">
-       <h6>{{measure.name}}</h6>
-       <h6>{{measure._measurement}}</h6>
-       <h6>{{measure._value}}</h6>
-       <h6>{{measure._time | date:'dd/MM/yyyy HH:mm'}}</h6>
+<div class="row mx-2 text-center">
+    <div class="col-12">
+        <h4>Measurements</h4>
     </div>
 </div>
-<iframe src="http://localhost:3000/d-solo/f065c3a2-c97e-4f48-a587-04a10e854772/dashboard-influx?orgId=1&from=1704289455529&to=1704311055529&panelId=1" width="450" height="200" frameborder="0"></iframe>
+<div class="row mx-2 text-center">
+    
+    <div class="col-6" *ngFor="let measure of measurements">
+       <h6>Device Name: {{measure.name}}</h6>
+       <h6>Measurement: {{measure._measurement}}</h6>
+       <h6>Measurement value: {{measure._value}}</h6>
+       <h6>Time of Measurement: {{measure._time | date:'dd/MM/yyyy HH:mm'}}</h6>
+    </div>
+</div>
+<div class="row text-center mx-2 my-3">
+    <div class="col-12" *ngIf="deviceName === 'RDHT4'">
+        <iframe src="http://localhost:3000/d-solo/f065c3a2-c97e-4f48-a587-04a10e854772/dashboard-influx?orgId=1&from=1704289455529&to=1704311055529&panelId=1" width="100%" height="200" frameborder="0"></iframe>
+    </div>
+    <div class="col-12" *ngIf="deviceName === 'RDHT1'">
+        <iframe src="http://localhost:3000/d-solo/f065c3a2-c97e-4f48-a587-04a10e854772/dashboard-influx?orgId=1&from=1704307358021&to=1704311942685&panelId=4" width="100%" height="200" frameborder="0"></iframe>
+    </div>
+    <div class="col-12" *ngIf="deviceName === 'RDHT2'">
+        <iframe src="http://localhost:3000/d-solo/f065c3a2-c97e-4f48-a587-04a10e854772/dashboard-influx?orgId=1&from=1704307358021&to=1704311942685&panelId=3" width="100%" height="200" frameborder="0"></iframe>
+    </div>
+    <div class="col-12" *ngIf="deviceName === 'RDHT3'">
+        <iframe src="http://localhost:3000/d-solo/f065c3a2-c97e-4f48-a587-04a10e854772/dashboard-influx?orgId=1&from=1704307358021&to=1704311942685&panelId=2" width="100%" height="200" frameborder="0"></iframe>
+    </div>
+</div>
