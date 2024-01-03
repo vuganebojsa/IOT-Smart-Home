@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { Device } from 'src/app/model/device';
 import { SmarthomeService } from 'src/app/services/smarthome.service';
 
 @Component({
@@ -10,11 +11,11 @@ export class DeviceInfoComponent implements OnInit{
   @Input() deviceName = '';
   @Input() measurementName = '';
   constructor(private service: SmarthomeService){}
-
+  measurements: Device[] = [];
   ngOnInit(): void {
     this.service.get_last_measurement(this.measurementName, this.deviceName).subscribe(
       result =>{
-        console.log(result);
+        this.measurements = result;
       }
     )
   }

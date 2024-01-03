@@ -1,1 +1,16 @@
-<p>device-info works!</p>
+<div class="row text-center my-3">
+    <div class="col-12">
+        <h2>{{this.deviceName}}</h2>
+    </div>
+</div>
+
+<div class="row mx-2">
+    <h5>Measurements</h5>
+    <div class="col-6" *ngFor="let measure of measurements">
+       <h6>{{measure.name}}</h6>
+       <h6>{{measure._measurement}}</h6>
+       <h6>{{measure._value}}</h6>
+       <h6>{{measure._time | date:'dd/MM/yyyy HH:mm'}}</h6>
+    </div>
+</div>
+<iframe src="http://localhost:3000/d-solo/f065c3a2-c97e-4f48-a587-04a10e854772/dashboard-influx?orgId=1&from=1704289455529&to=1704311055529&panelId=1" width="450" height="200" frameborder="0"></iframe>
