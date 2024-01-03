@@ -117,17 +117,70 @@ def handle_influx_query(query):
 
 @app.route('/measurement/<string:name>/<string:devicename>', methods=['GET'])
 def get_last_measurement_data(name, devicename):
-    query = f"""from(bucket: "{bucket}")
-    |> range(start: -5m)
-    |> filter(fn: (r) => r._measurement == "{name}")
-    |> filter(fn: (r) => r["name"] == "{devicename}")
-    |> limit(n: 1)
-    """
-    values = handle_influx_query(query)
-    if 'error' not in values:
-        return values['data'][0]
+    print(name)
+
+    print(name)
+    if name == 'dht':
+
+        query = f"""from(bucket: "{bucket}")
+        |> range(start: -5m)
+        |> filter(fn: (r) => r._measurement == "Temperature")
+        |> filter(fn: (r) => r["name"] == "{devicename}")
+        |> limit(n: 1)
+        """
+        temperature = handle_influx_query(query)
+        if 'error' not in temperature:
+            if len(temperature['data']) > 0:
+                values.append(temperature['data'][0])
+        query = f"""from(bucket: "{bucket}")
+        |> range(start: -5m)
+        |> filter(fn: (r) => r._measurement == "Humidity")
+        |> filter(fn: (r) => r["name"] == "{devicename}")
+        |> limit(n: 1)
+        """
+        humidity = handle_influx_query(query)
+        if 'error' not in humidity:
+            if len(humidity['data']) > 0:
+                values.append(humidity['data'][0])
+        return values
+
+    elif name == 'gyro':
+        query = f"""from(bucket: "{bucket}")
+        |> range(start: -5m)
+        |> filter(fn: (r) => r._measurement == "Accelerator")
+        |> filter(fn: (r) => r["name"] == "{devicename}")
+        |> limit(n: 1)
+        """
+        accelerator = handle_influx_query(query)
+        if 'error' not in accelerator:
+            if len(accelerator['data']) > 0:
+                values.append(accelerator['data'][0])
+        query = f"""from(bucket: "{bucket}")
+        |> range(start: -5m)
+        |> filter(fn: (r) => r._measurement == "Gyroscope")
+        |> filter(fn: (r) => r["name"] == "{devicename}")
+        |> limit(n: 1)
+        """
+        gyroscope = handle_influx_query(query)
+        if 'error' not in gyroscope:
+            if len(gyroscope['data']) > 0:
+                values.append(gyroscope['data'][0])
+        return values
+
     else:
-        return values['message']
+        query = f"""from(bucket: "{bucket}")
+        |> range(start: -5m)
+        |> filter(fn: (r) => r._measurement == "{name}")
+        |> filter(fn: (r) => r["name"] == "{devicename}")
+        |> limit(n: 1)
+        """
+        values = handle_influx_query(query)
+        if 'error' not in values:
+            if len(values['data']) > 0:
+                return values['data']
+            return []
+        else:
+            return values['message']
 
 
 
