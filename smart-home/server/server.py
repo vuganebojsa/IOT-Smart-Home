@@ -115,6 +115,17 @@ def handle_influx_query(query):
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
+@app.route('/measurement/<string:name>/<string:devicename>', methods=['GET'])
+def get_last_measurement_data(name, devicename):
+    query = f"""from(bucket: "{bucket}")
+    |> range(start: -10m)
+    |> filter(fn: (r) => r._measurement == "{name}")
+    |> filter(fn: (r) => r["name"] == "{devicename}")
+    |> limit(n: 1)
+    """
+    return handle_influx_query(query)
+
+
 
 @app.route('/simple_query', methods=['GET'])
 def retrieve_simple_data():
