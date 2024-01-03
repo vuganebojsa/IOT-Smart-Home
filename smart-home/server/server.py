@@ -118,12 +118,16 @@ def handle_influx_query(query):
 @app.route('/measurement/<string:name>/<string:devicename>', methods=['GET'])
 def get_last_measurement_data(name, devicename):
     query = f"""from(bucket: "{bucket}")
-    |> range(start: -10m)
+    |> range(start: -5m)
     |> filter(fn: (r) => r._measurement == "{name}")
     |> filter(fn: (r) => r["name"] == "{devicename}")
     |> limit(n: 1)
     """
-    return handle_influx_query(query)
+    values = handle_influx_query(query)
+    if 'error' not in values:
+        return values['data'][0]
+    else:
+        return values['message']
 
 
 
