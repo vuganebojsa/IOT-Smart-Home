@@ -12,7 +12,7 @@ app = Flask(__name__)
 users_inside = 0
 alarm_active = False
 system_active = False
-token = "en1PQdEjc5Mqqct6lrc7lCO_7EDQc2auk6GMMKykVFMIPyD0gBPVE1UYj92RPW9h9mrKwzqR0QN6-iLttvJDGg=="
+token = "g7NJVRHodhza0U5BLCtEnqBxbWiwBYh_a-6MndQ6DQFCHqISWhI6TlqlHZ9s586yoTrbR-026oIUzeRD3jLt3A=="
 org = "FTN"
 url = "http://localhost:8086"
 bucket = "iot_smart_home"
@@ -95,7 +95,7 @@ def save_to_db(topic, data):
         if data['suspicious'] is not None and data['suspicious'] == True:
             alarm_active = True
             write_alarm_query(write_api, data['name'], data['_time'], alarm_active, data['name'] + ' detected unusual values.', data['simulated'])
-        write_gsg(write_api, data)
+        write_db(write_api, data)
     elif topic == 'lcd':
 
         write_db(write_api, data)

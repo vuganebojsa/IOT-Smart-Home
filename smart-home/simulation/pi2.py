@@ -64,6 +64,8 @@ def handle_message(topic, data):
 
 def on_message(client, userdata, msg):
     handle_message(msg.topic, json.loads(msg.payload.decode('utf-8')))
+
+
 if __name__ == "__main__":
     # MQTT Configuration
     settings = load_settings('settingspi2.json')
@@ -72,12 +74,9 @@ if __name__ == "__main__":
     pause_event = threading.Event()
     mqtt_client = mqtt.Client()
 
-
-
     def on_connect(client, userdata, flags, rc):
 
-        client.subscribe("dht-lcd-display")
-
+        client.subscribe("dht-lcd-display", qos=1)
 
     mqtt_client.on_connect = on_connect
     mqtt_client.on_message = on_message
