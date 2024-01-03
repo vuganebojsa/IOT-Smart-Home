@@ -1,3 +1,6 @@
+import threading
+import time
+
 from flask import Flask, jsonify, request
 from influxdb_client import InfluxDBClient, Point
 from influxdb_client.client.write_api import SYNCHRONOUS
@@ -6,6 +9,7 @@ import json
 from influx_writes import *
 import paho.mqtt.publish as publish
 from flask_cors import CORS
+import schedule
 
 
 app = Flask(__name__)
@@ -24,7 +28,7 @@ bucket = "iot_smart_home"
 influxdb_client = InfluxDBClient(url=url, token=token, org=org)
 HOSTNAME = "localhost"
 PORT = 1883
-
+scheduled = False
 # MQTT Configuration
 
 def on_connect(client, userdata, flags, rc):
@@ -145,12 +149,33 @@ def retrieve_simple_data():
     |> filter(fn: (r) => r._measurement == "Light")"""
     return handle_influx_query(query)
 
+def activate_alarm():
+    print("Alarm activated! Ovde pozovite određenu funkciju.")
 @app.route('/set_alarm', methods=['POST'])
 def set_alarm():
+    global scheduled
+
     try:
         data = request.get_json()
         alarm_time = data.get("alarm_time")
         print(f"Postavljen alarm za: {alarm_time}")
+        print(scheduled)
+        if not scheduled:
+            alarm_time_obj = datetime.strptime(alarm_time, "%H:%M").time()
+            print(alarm_time_obj.strftime("%H:%M"))
+            schedule.every().day.at(alarm_time_obj.strftime("%H:%M")).do(activate_alarm)
+            scheduled = True
+
+        # Ovde možete postaviti thread da periodički poziva schedule.run_pending()
+        # na primer, u jednoj odvojenoj niti
+        def run_schedule():
+            while True:
+                schedule.run_pending()
+                time.sleep(1)  # Smanjite ovo ako želite brže osvežavanje
+
+
+            # Pokreni odvojenu nit samo ako već nije pokrenuta
+        threading.Thread(target=run_schedule, daemon=True).start()
 
         return jsonify({"message": "Alarm set successfully"})
     except Exception as e:
