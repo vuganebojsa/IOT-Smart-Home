@@ -5,7 +5,7 @@ import random
 def generate_value():
     while True:
         state_changed = random.randint(-5, 5)
-        result_str = ''.join((random.choice('1234567890') for i in range(5)))
+        result_str = ''.join((random.choice('1234567890') for i in range(4)))
         if state_changed < 0:
             continue
         yield result_str
