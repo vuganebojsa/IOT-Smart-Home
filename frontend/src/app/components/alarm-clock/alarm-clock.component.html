@@ -1,3 +1,9 @@
-<p>alarm-clock works!</p>
-<input placeholder="Time" [ngxTimepicker]="picker">
-<ngx-material-timepicker #picker></ngx-material-timepicker>
+<div class="margin-left">
+<h2>Choose alarm time</h2>
+<input placeholder="Time" [ngxTimepicker]="picker" [format]="24">
+<ngx-material-timepicker #picker (timeSet)="onTimeSet($event)"></ngx-material-timepicker>
+
+</div>
+<div class="margin-left mt-3">
+    <button class="register" (click)="onSetAlarmClick()">Set alarm</button>
+</div>
