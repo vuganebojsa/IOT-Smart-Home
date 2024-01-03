@@ -2,14 +2,8 @@
 
 from PCF8574 import PCF8574_GPIO
 from Adafruit_LCD1602 import Adafruit_CharLCD
-
-
 import time
  
-
-
-
-    
 PCF8574_address = 0x27
 PCF8574A_address = 0x3F
 
@@ -38,8 +32,10 @@ def run_lcd_loop(delay, callback, stop_event, settings, publish_event, msg):
     lcd.begin(16, 2)  # set number of LCD lines and columns
     while True:
         message = msg
+        display(message)
         callback(message, settings, publish_event)
         if stop_event.is_set():
+            lcd.clear()
             break
         time.sleep(delay)  # Delay between readings
 

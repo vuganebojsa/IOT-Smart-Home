@@ -44,7 +44,7 @@ def save_to_db(topic, data):
     if topic == 'dht':
 
         if data['name'] == 'GDHT':
-            dht_message = "humidity: " + str(data["value_humidity"]) + ", " + "temperature: " + str(data["value_temperature"])
+            dht_message = "humidity: " + str(data["value_humidity"]) + "\n" + "temperature: " + str(data["value_temperature"])
 
             publish.single('dht-lcd-display', json.dumps({'temperature':dht_message}), hostname=HOSTNAME, port=PORT)
         write_dht(write_api, data)
