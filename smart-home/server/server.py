@@ -6,6 +6,8 @@ import json
 from influx_writes import *
 import paho.mqtt.publish as publish
 app = Flask(__name__)
+mqtt_client = mqtt.Client()
+
 @app.after_request
 def add_cors_headers(response):
     response.headers['Access-Control-Allow-Origin'] = '*'
@@ -196,11 +198,25 @@ def get_last_measurement_data(name, devicename):
 
 @app.route('/activate-safety-system/<string:pin>', methods=['PUT'])
 def activate_safety_system(pin):
-    pass
+    if '#' in pin:
+        if len(pin) != 5:
+            return json.dumps({'error': 'Pin should have 4 characters + #'})
+    else:
+        if len(pin) != 4:
+            return json.dumps({'error': 'Pin should have 4 characters'})
+    mqtt_client.publish('activate-safety-system', json.dumps({'pin':pin}), qos=1)
+    return json.dumps({'response': 'Alarm successfully activated'})
 
 @app.route('/deactivate-safety-system/<string:pin>', methods=['PUT'])
 def deactivate_safety_system(pin):
-    pass
+    if '#' in pin:
+        if len(pin) != 5:
+            return json.dumps({'error': 'Pin should have 4 characters + #'})
+    else:
+        if len(pin) != 4:
+            return json.dumps({'error': 'Pin should have 4 characters'})
+    mqtt_client.publish('deactivate-safety-system', json.dumps({'pin':pin}), qos=1)
+    return json.dumps({'response': 'Alarm successfully deactivated.'})
 
 @app.route('/simple_query', methods=['GET'])
 def retrieve_simple_data():
@@ -211,7 +227,6 @@ def retrieve_simple_data():
 
 
 if __name__ == '__main__':
-    mqtt_client = mqtt.Client()
     mqtt_client.connect("localhost", 1883, 60)
     mqtt_client.loop_start()
     
