@@ -194,6 +194,14 @@ def get_last_measurement_data(name, devicename):
 
 
 
+@app.route('/activate-safety-system/<string:pin>', methods=['PUT'])
+def activate_safety_system(pin):
+    pass
+
+@app.route('/deactivate-safety-system/<string:pin>', methods=['PUT'])
+def deactivate_safety_system(pin):
+    pass
+
 @app.route('/simple_query', methods=['GET'])
 def retrieve_simple_data():
     query = f"""from(bucket: "{bucket}")
