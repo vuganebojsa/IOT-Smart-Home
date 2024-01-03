@@ -57,7 +57,7 @@ publisher_thread.start()
 
 def run_ds(settings, threads, stop_event, code):
         if settings['simulated']:
-            ds_thread = threading.Thread(target = run_ds_simulator, args=(5, ds_callback, stop_event, settings, publish_event))
+            ds_thread = threading.Thread(target = run_ds_simulator, args=(1, ds_callback, stop_event, settings, publish_event))
             ds_thread.start()
             threads.append(ds_thread)
             print(code + " sumilator started\n")
