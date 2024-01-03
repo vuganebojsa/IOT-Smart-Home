@@ -7,6 +7,10 @@ def generate_values(initial_temp = 25, initial_humidity=20):
       while True:
             temperature = temperature + random.randint(-1, 1)
             humidity = humidity + random.randint(-1, 1)
+            if temperature < 15:
+                 temperature = 16
+            if temperature > 35:
+                 temperature = 33
             if humidity < 0:
                   humidity = 0
             if humidity > 100:
