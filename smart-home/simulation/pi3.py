@@ -7,6 +7,7 @@ from components.bir import run_bir
 import time
 from components.db import run_db
 from locks.print_lock import print_lock
+from components.b4sd import run_b4sd
 
 try:
     import RPi.GPIO as GPIO
@@ -33,6 +34,11 @@ def run_bb_threads(settings, threads, stop_event):
     run_db(db_settings, threads, stop_event, "BB")
 
 
+def run_b4sd_threads(settings, threads, stop_event):
+    bir_settings = settings['B4SD']
+
+    run_b4sd(bir_settings, threads, stop_event)
+
 if __name__ == "__main__":
     print('Starting app')
     settings = load_settings('settingspi3.json')
@@ -43,6 +49,7 @@ if __name__ == "__main__":
         run_dht_threads(settings, threads, stop_event)
         run_pir_threads(settings, threads, stop_event)
         run_bir_threads(settings, threads, stop_event)
+        run_b4sd_threads(settings, threads, stop_event)
         while True:
             time.sleep(0.1)
     except KeyboardInterrupt:

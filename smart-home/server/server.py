@@ -33,6 +33,7 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("dl", qos=1)
     client.subscribe("lcd", qos=1)
     client.subscribe("gsg", qos=1)
+    client.subscribe("b4sd", qos=1)
 
 
 
@@ -96,9 +97,9 @@ def save_to_db(topic, data):
             alarm_active = True
             write_alarm_query(write_api, data['name'], data['_time'], alarm_active, data['name'] + ' detected unusual values.', data['simulated'])
         write_db(write_api, data)
-    elif topic == 'lcd':
-
+    elif topic == 'lcd' or topic == 'b4sd':
         write_db(write_api, data)
+
 
 def handle_influx_query(query):
     try:
