@@ -21,6 +21,7 @@ users_inside = 0
 alarm_active = False
 system_active = False
 alarm_active_button = False
+clock_active = False
 token = "kw71CyjVbIlWpLtIXqWBTAnKGGKgOeT4UANgRNdnJOZJsT0k70IUXAQG0JXV_nqyk8-PpVdaAKEfM3CvkYTa7A=="
 org = "FTN"
 url = "http://localhost:8086"
@@ -150,6 +151,11 @@ def retrieve_simple_data():
     return handle_influx_query(query)
 
 def activate_alarm():
+    global clock_active, scheduled
+    clock_active = True
+    scheduled = False
+    publish.single('clock-activate', json.dumps({'clock':'on'}), hostname=HOSTNAME, port=PORT)
+
     print("Alarm activated! Ovde pozovite određenu funkciju.")
 @app.route('/set_alarm', methods=['POST'])
 def set_alarm():
