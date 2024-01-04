@@ -78,6 +78,7 @@ def save_to_db(topic, data):
             publish.single('dht-lcd-display', json.dumps({'temperature':dht_message}), hostname=HOSTNAME, port=PORT)
         write_dht(write_api, data)
     elif topic == 'dms':
+        print(data)
         write_dms(write_api, data)
     elif topic == 'ds':
         if 'alarm' in data and data['alarm'] == True:
