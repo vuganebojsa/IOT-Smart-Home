@@ -4,75 +4,85 @@ from time import sleep
 #disable warnings (optional)
 GPIO.setwarnings(False)
 
-GPIO.setmode(GPIO.BCM)
 
-RED_PIN = 12
-GREEN_PIN = 13
-BLUE_PIN = 19
 
-#set pins as outputs
-GPIO.setup(RED_PIN, GPIO.OUT)
-GPIO.setup(GREEN_PIN, GPIO.OUT)
-GPIO.setup(BLUE_PIN, GPIO.OUT)
-
-def turnOff():
+def turnOff(RED_PIN, GREEN_PIN, BLUE_PIN):
     GPIO.output(RED_PIN, GPIO.LOW)
     GPIO.output(GREEN_PIN, GPIO.LOW)
     GPIO.output(BLUE_PIN, GPIO.LOW)
     
-def white():
+def white(RED_PIN, GREEN_PIN, BLUE_PIN):
     GPIO.output(RED_PIN, GPIO.HIGH)
     GPIO.output(GREEN_PIN, GPIO.HIGH)
     GPIO.output(BLUE_PIN, GPIO.HIGH)
     
-def red():
+def red(RED_PIN, GREEN_PIN, BLUE_PIN):
     GPIO.output(RED_PIN, GPIO.HIGH)
     GPIO.output(GREEN_PIN, GPIO.LOW)
     GPIO.output(BLUE_PIN, GPIO.LOW)
 
-def green():
+def green(RED_PIN, GREEN_PIN, BLUE_PIN):
     GPIO.output(RED_PIN, GPIO.LOW)
     GPIO.output(GREEN_PIN, GPIO.HIGH)
     GPIO.output(BLUE_PIN, GPIO.LOW)
     
-def blue():
+def blue(RED_PIN, GREEN_PIN, BLUE_PIN):
     GPIO.output(RED_PIN, GPIO.LOW)
     GPIO.output(GREEN_PIN, GPIO.LOW)
     GPIO.output(BLUE_PIN, GPIO.HIGH)
     
-def yellow():
+def yellow(RED_PIN, GREEN_PIN, BLUE_PIN):
     GPIO.output(RED_PIN, GPIO.HIGH)
     GPIO.output(GREEN_PIN, GPIO.HIGH)
     GPIO.output(BLUE_PIN, GPIO.LOW)
     
-def purple():
+def purple(RED_PIN, GREEN_PIN, BLUE_PIN):
     GPIO.output(RED_PIN, GPIO.HIGH)
     GPIO.output(GREEN_PIN, GPIO.LOW)
     GPIO.output(BLUE_PIN, GPIO.HIGH)
     
-def lightBlue():
+def lightBlue(RED_PIN, GREEN_PIN, BLUE_PIN):
     GPIO.output(RED_PIN, GPIO.LOW)
     GPIO.output(GREEN_PIN, GPIO.HIGH)
     GPIO.output(BLUE_PIN, GPIO.HIGH)
 
-def run():
+def run(rgb_callback, stop_event, settings, publish_event, rr, gg, bb, button_pressed):
+    GPIO.setmode(GPIO.BCM)
+
+    RED_PIN = rr
+    GREEN_PIN = gg
+    BLUE_PIN = bb
+
+    #set pins as outputs
+    GPIO.setup(RED_PIN, GPIO.OUT)
+    GPIO.setup(GREEN_PIN, GPIO.OUT)
+    GPIO.setup(BLUE_PIN, GPIO.OUT)
     try:
+        #ButtonsNames = ["LEFT",   "RIGHT",      "UP",       "DOWN",     
+          #"2",          "3",          "1",        "OK",        "4",         
+        # "5",         "6",         "7",         "8",          "9",        "*",        
+        # "0",        "#"]  # String list in same order as HEX list
+
         while True:
-            turnOff()
-            sleep(1)
-            white()
-            sleep(1)
-            red()
-            sleep(1)
-            green()
-            sleep(1)
-            blue()
-            sleep(1)
-            yellow()
-            sleep(1)
-            purple()
-            sleep(1)
-            lightBlue()
-            sleep(1)
+            if button_pressed == '0':
+                turnOff(rr, gg, bb)
+            elif button_pressed == '1':
+                white(rr, gg, bb)
+            elif button_pressed == '2':
+                red(rr, gg, bb)
+            elif button_pressed == '3':
+                green(rr, gg, bb)
+            elif button_pressed == '4':
+                blue(rr, gg, bb)
+            elif button_pressed == '5':
+                lightBlue(rr, gg, bb)
+            elif button_pressed == '6':
+                purple(rr, gg, bb)
+            elif button_pressed == '7':
+                yellow(rr, gg, bb)
+            rgb_callback(settings, publish_event, button_pressed)
+            if stop_event.is_set():
+                GPIO.cleanup()
+                break
     except KeyboardInterrupt:
         GPIO.cleanup()

@@ -44,7 +44,10 @@ def dl_callback(settings, publish_event):
     with print_lock:
         dht_batch.append(('dl', json.dumps(payload), 0, True))
         publish_data_counter += 1
-    time.sleep(10)
+    if settings['simulated']:
+        print('Light is on')
+        time.sleep(10)
+        print('Light is off')
     current_datetime = datetime.now()
 
     adjusted_datetime = current_datetime - timedelta(hours=1)

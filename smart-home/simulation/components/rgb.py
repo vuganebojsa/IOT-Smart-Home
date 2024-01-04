@@ -12,8 +12,7 @@ from datetime import datetime, timedelta
 rgb_batch = []
 publish_data_counter = 0
 publish_data_limit = 5
-color = ''
-is_on = False
+
 def publisher_task(event, rgb_batch):
     global publish_data_counter, publish_data_limit
     while True:
@@ -27,16 +26,29 @@ def publisher_task(event, rgb_batch):
         event.clear()
 
 
-def rgb_callback(settings, publish_event):
-    global color
-    global is_on
+def rgb_callback(settings, publish_event, button_pressed):
+
     global publish_data_counter, publish_data_limit
+    new_color = '' 
+    if settings['simvulated']:
+        if button_pressed == '0':
+                new_color = 'none'
+            elif button_pressed == '1':
+                new_color = 'white'
+            elif button_pressed == '2':
+                new_color = 'red'
 
+            elif button_pressed == '3':
+                new_color = 'green'
 
-    if result:
-        result = False
-    else:
-        result = True
+            elif button_pressed == '4':
+                new_color = 'blue'
+            elif button_pressed == '5':
+                new_color = 'lightBlue'
+            elif button_pressed == '6':
+                new_color = 'purple'
+            elif button_pressed == '7':
+                new_color = 'yellow'
     current_datetime = datetime.now()
 
     adjusted_datetime = current_datetime - timedelta(hours=1)
@@ -47,7 +59,7 @@ def rgb_callback(settings, publish_event):
         'simulated': settings['simulated'],
         'runs_on': settings['runs_on'],
         'name': settings['name'],
-        'value': result,
+        'value': new_color,
         '_time': formatted_time
     }
     with print_lock:
@@ -63,13 +75,18 @@ publisher_thread = threading.Thread(target=publisher_task, args=(publish_event, 
 publisher_thread.daemon = True
 publisher_thread.start()
 
-def run_rgb(settings, threads, stop_event, code):
+def run_rgb(settings, threads, stop_event, code, button_pressed):
+        #ButtonsNames = ["LEFT",   "RIGHT",      "UP",       "DOWN",       "2",          "3",          "1",        "OK",        "4",         "5",         "6",         "7",         "8",          "9",        "*",         "0",        "#"]  # String list in same order as HEX list
+
         if settings['simulated']:
-            dl_thread = threading.Thread(target = rgb_callback, args=( settings, publish_event))
+            dl_thread = threading.Thread(target = rgb_callback, args=( settings, publish_event, button_pressed))
             dl_thread.start()
             threads.append(dl_thread)
         else:
-            pin =settings['pin']
-            dms_thread = threading.Thread(target=run, args=(pin,rgb_callback, stop_event, settings, publish_event))
+            red = settings["RED"]
+            green = settings["GREEN"]
+            blue = settings["BLUE"]
+            
+            dms_thread = threading.Thread(target=run, args=(rgb_callback, stop_event, settings, publish_event, red, green, blue, button_pressed))
             dms_thread.start()
             threads.append(dms_thread)

@@ -77,9 +77,13 @@ def getBinary():
 def convertHex(binaryValue):
 	tmpB2 = int(str(binaryValue),2) #Temporarely propper base 2
 	return hex(tmpB2)
-	
-while True:
-	inData = convertHex(getBinary()) #Runs subs to get incoming hex value
-	for button in range(len(Buttons)):#Runs through every value in list
-		if hex(Buttons[button]) == inData: #Checks this against incoming
-			print(ButtonsNames[button]) #Prints corresponding english name for button
+
+def run(bir_callback, stop_event, settings, publish_event):
+	while True:
+		inData = convertHex(getBinary()) #Runs subs to get incoming hex value
+		for button in range(len(Buttons)):#Runs through every value in list
+			if hex(Buttons[button]) == inData: #Checks this against incoming
+				bir_callback(ButtonsNames[button], settings, publish_event)
+				print(ButtonsNames[button]) #Prints corresponding english name for button
+		if stop_event.is_set():
+			break
