@@ -62,7 +62,6 @@ def run(rgb_callback, stop_event, settings, publish_event, rr, gg, bb, button_pr
           #"2",          "3",          "1",        "OK",        "4",         
         # "5",         "6",         "7",         "8",          "9",        "*",        
         # "0",        "#"]  # String list in same order as HEX list
-
         while True:
             if button_pressed == '0':
                 turnOff(rr, gg, bb)

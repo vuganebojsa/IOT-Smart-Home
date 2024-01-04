@@ -30,25 +30,24 @@ def rgb_callback(settings, publish_event, button_pressed):
 
     global publish_data_counter, publish_data_limit
     new_color = '' 
-    if settings['simvulated']:
-        if button_pressed == '0':
-                new_color = 'none'
-            elif button_pressed == '1':
-                new_color = 'white'
-            elif button_pressed == '2':
-                new_color = 'red'
+    if button_pressed == '0':
+            new_color = 'none'
+    elif button_pressed == '1':
+        new_color = 'white'
+    elif button_pressed == '2':
+        new_color = 'red'
 
-            elif button_pressed == '3':
-                new_color = 'green'
+    elif button_pressed == '3':
+        new_color = 'green'
 
-            elif button_pressed == '4':
-                new_color = 'blue'
-            elif button_pressed == '5':
-                new_color = 'lightBlue'
-            elif button_pressed == '6':
-                new_color = 'purple'
-            elif button_pressed == '7':
-                new_color = 'yellow'
+    elif button_pressed == '4':
+        new_color = 'blue'
+    elif button_pressed == '5':
+        new_color = 'lightBlue'
+    elif button_pressed == '6':
+        new_color = 'purple'
+    elif button_pressed == '7':
+        new_color = 'yellow'
     current_datetime = datetime.now()
 
     adjusted_datetime = current_datetime - timedelta(hours=1)
