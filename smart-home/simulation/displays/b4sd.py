@@ -78,10 +78,20 @@ num = {' ': (0, 0, 0, 0, 0, 0, 0),
        '8': (1, 1, 1, 1, 1, 1, 1),
        '9': (1, 1, 1, 1, 0, 1, 1)}
 
-def run(callback, stop_event, settings, publish_event):
+def run(callback, stop_event, settings, publish_event, clock_event):
+    is_empty = False
     try:
         while True:
-            current_time = time.strftime("%H %M")
+            if clock_event.is_set():
+                if not is_empty:
+                    current_time = time.strftime("%H %M")
+                    is_empty = True
+                else:
+                    current_time = "    "
+                    is_empty = False
+                time.sleep(0.5)
+            else:
+                current_time = time.strftime("%H %M")
             for digit in range(4):
                 for loop in range(0, 7):
                     GPIO.output(segments[loop], num[current_time[digit]][loop])
@@ -103,5 +113,3 @@ def run(callback, stop_event, settings, publish_event):
     finally:
         GPIO.cleanup()
 
-
-run()

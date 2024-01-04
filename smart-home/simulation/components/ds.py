@@ -33,9 +33,6 @@ def publisher_task(event, dht_batch):
 
 def ds_callback(current_value, settings,publish_event):
     global publish_data_counter, publish_data_limit, button_pressed_time, past_value, button_pressed_5_seconds
-
-
-
     if current_value is True:
         value = 1
         if past_value == False:
@@ -51,7 +48,7 @@ def ds_callback(current_value, settings,publish_event):
 
     if button_pressed_time is not None and (time.time() - button_pressed_time) > 5 and not button_pressed_5_seconds :
         button_pressed_5_seconds = True
-        print("ALARRM")
+
 
 
     if button_pressed_time is not None:

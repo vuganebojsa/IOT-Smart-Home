@@ -7,9 +7,20 @@ def generate_value():
         yield current_time
 
               
-def run_b4sd_simulator(delay, callback, stop_event, settings, publish_event):
+def run_b4sd_simulator(delay, callback, stop_event, settings, publish_event, clock_event):
+    is_empty = False
     for value in generate_value():
-        time.sleep(delay)  # Delay between readings (adjust as needed)
+        # Delay between readings (adjust as needed)
+        if clock_event.is_set():
+            time.sleep(0.5)
+            if is_empty:
+                is_empty = False
+                value = "    "
+            else:
+                is_empty = True
+        else:
+            time.sleep(delay)
+        print(value)
         callback(value, settings, publish_event)
         if stop_event.is_set():
             break
