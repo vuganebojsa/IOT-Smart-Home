@@ -48,6 +48,7 @@ def rgb_callback(settings, publish_event, button_pressed):
         new_color = 'purple'
     elif button_pressed == '7':
         new_color = 'yellow'
+    print(new_color)
     current_datetime = datetime.now()
 
     adjusted_datetime = current_datetime - timedelta(hours=1)
@@ -74,7 +75,7 @@ publisher_thread = threading.Thread(target=publisher_task, args=(publish_event, 
 publisher_thread.daemon = True
 publisher_thread.start()
 
-def run_rgb(settings, threads, stop_event, code, button_pressed):
+def run_rgb(settings, threads, stop_event, button_pressed):
         #ButtonsNames = ["LEFT",   "RIGHT",      "UP",       "DOWN",       "2",          "3",          "1",        "OK",        "4",         "5",         "6",         "7",         "8",          "9",        "*",         "0",        "#"]  # String list in same order as HEX list
 
         if settings['simulated']:

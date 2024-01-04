@@ -33,13 +33,15 @@ def bir_callback(button_pressed, settings, publish_event):
 
     formatted_time = adjusted_datetime.isoformat()
     payload = {
-        'measurement': 'Motion',
+        'measurement': 'Button Pressed',
         'simulated': settings['simulated'],
         'runs_on': settings['runs_on'],
         'name': settings['name'],
         'value': button_pressed,
         '_time': formatted_time
     }
+    publish.single('bir-button-pressed', json.dumps({'button': button_pressed}), hostname=HOSTNAME, port=PORT)
+
     with print_lock:
         bir_batch.append(('bir', json.dumps(payload), 0, True))
         publish_data_counter += 1
@@ -54,7 +56,7 @@ publisher_thread.start()
 def run_bir(settings, threads, stop_event):
         if settings['simulated']:
             dpir_thread = threading.Thread(target=run_bir_simulator,
-                                          args=(5, bir_callback, stop_event, settings, publish_event))
+                                          args=(30, bir_callback, stop_event, settings, publish_event))
             dpir_thread.start()
             threads.append(dpir_thread)
         else:

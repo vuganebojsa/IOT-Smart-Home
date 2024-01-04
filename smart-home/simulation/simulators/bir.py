@@ -1,19 +1,13 @@
 import time
 import random
 
-def generate_value():
-      while True:
-            motion_detected = random.randint(-5, 5)
-            ret_motion = True
-            if motion_detected < 2:
-                 ret_motion = False
-            yield ret_motion
-
-              
+    
 def run_bir_simulator(delay, callback, stop_event, settings, publish_event):
-    for motion in generate_value():
-        time.sleep(delay)  # Delay between readings (adjust as needed)
-        callback(motion, settings, publish_event)
+    while True:
+        buttons = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '#']
+        random_button = random.choice(buttons)
+        callback(random_button, settings, publish_event)
+        time.sleep(delay)
         if stop_event.is_set():
             break
             

@@ -6,6 +6,7 @@ from components.pir import run_pir
 from components.bir import run_bir
 import time
 from components.db import run_db
+from components.rgb import run_rgb
 from locks.print_lock import print_lock
 from components.b4sd import run_b4sd
 import paho.mqtt.client as mqtt
@@ -41,6 +42,13 @@ def run_b4sd_threads(settings, threads, stop_event, clock_event):
 
     run_b4sd(bir_settings, threads, stop_event, clock_event)
 
+def run_rgb_threads(settings, threads, stop_event, button_pressed):
+    db_settings = settings["BRGB"]
+    run_rgb(db_settings, threads, stop_event, button_pressed)
+
+settings = load_settings('settingspi3.json')
+threads = []
+stop_event = threading.Event()
 alarm_event = threading.Event()
 clock_event = threading.Event()
 
@@ -53,14 +61,14 @@ def handle_message(topic, data):
         alarm_event.set()
     elif topic == 'alarm-off':
         alarm_event.clear()
+    elif topic == 'bir-button-pressed':
+        run_rgb_threads(settings, threads, stop_event, data['button'])
 def on_message(client, userdata, msg):
     handle_message(msg.topic, json.loads(msg.payload.decode('utf-8')))
 
 if __name__ == "__main__":
     # MQTT Configuration
-    settings = load_settings('settingspi3.json')
-    threads = []
-    stop_event = threading.Event()
+    
     pause_event = threading.Event()
     mqtt_client = mqtt.Client()
 
@@ -71,6 +79,7 @@ if __name__ == "__main__":
         client.subscribe("clock-stop", qos=1)
         client.subscribe("alarm-on", qos=1)
         client.subscribe("alarm-off", qos=1)
+        client.subscribe("bir-button-pressed", qos=1)
 
     mqtt_client.on_connect = on_connect
     mqtt_client.on_message = on_message

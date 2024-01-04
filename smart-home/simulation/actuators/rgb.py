@@ -1,8 +1,9 @@
-import RPi.GPIO as GPIO
-from time import sleep
+try:
+    import RPi.GPIO as GPIO
+    GPIO.setwarnings(False)
+except:
+    print('Cant load')
 
-#disable warnings (optional)
-GPIO.setwarnings(False)
 
 
 
