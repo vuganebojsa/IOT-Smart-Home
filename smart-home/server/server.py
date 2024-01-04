@@ -160,30 +160,33 @@ def activate_alarm():
 @app.route('/set_alarm', methods=['POST'])
 def set_alarm():
     global scheduled
-
     try:
         data = request.get_json()
         alarm_time = data.get("alarm_time")
         print(f"Postavljen alarm za: {alarm_time}")
-        print(scheduled)
         if not scheduled:
             alarm_time_obj = datetime.strptime(alarm_time, "%H:%M").time()
             print(alarm_time_obj.strftime("%H:%M"))
             schedule.every().day.at(alarm_time_obj.strftime("%H:%M")).do(activate_alarm)
             scheduled = True
-
-        # Ovde možete postaviti thread da periodički poziva schedule.run_pending()
-        # na primer, u jednoj odvojenoj niti
         def run_schedule():
-            while True:
+            while scheduled is True:
                 schedule.run_pending()
-                time.sleep(1)  # Smanjite ovo ako želite brže osvežavanje
-
-
-            # Pokreni odvojenu nit samo ako već nije pokrenuta
+                time.sleep(1)
         threading.Thread(target=run_schedule, daemon=True).start()
 
         return jsonify({"message": "Alarm set successfully"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/stop_alarm', methods=['POST'])
+def stop_alarm():
+    global clock_active
+    try:
+
+        publish.single('clock-stop', json.dumps({'clock': 'off'}), hostname=HOSTNAME, port=PORT)
+        clock_active = False
+        return jsonify({"message": "Clock stopped successfully"})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
