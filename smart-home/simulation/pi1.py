@@ -96,6 +96,10 @@ def handle_message(topic, data):
         clock_event.set()
     elif topic == 'clock-stop':
         clock_event.clear()
+    elif topic == 'alarm-on':
+        alarm_event.set()
+    elif topic == 'alarm-off':
+        alarm_event.clear()
 
 if __name__ == "__main__":
     # MQTT Configuration
@@ -111,6 +115,8 @@ if __name__ == "__main__":
         client.subscribe("dpir1-light-on")
         client.subscribe("clock-activate", qos=1)
         client.subscribe("clock-stop", qos=1)
+        client.subscribe("alarm-on", qos=1)
+        client.subscribe("alarm-off", qos=1)
 
 
     mqtt_client.on_connect = on_connect

@@ -72,6 +72,7 @@ def save_to_db(topic, data):
         if 'alarm' in data and data['alarm'] == True:
             if alarm_active_button != True:
                 print("UKLJUCIO")
+                mqtt_client.publish('alarm-on', json.dumps({'':''}), qos=1)
                 alarm_active = True
                 alarm_active_button = True
                 write_alarm_query(write_api, data['name'], data['_time'], alarm_active,
@@ -79,19 +80,22 @@ def save_to_db(topic, data):
         elif data['alarm'] is not None and data['alarm'] == False:
             if alarm_active_button != False:
                 print("ISKLJUCIO")
+                mqtt_client.publish('alarm-off', json.dumps({'':''}), qos=1)
+
                 alarm_active = False
                 alarm_active_button = False
                 write_alarm_query(write_api, data['name'], data['_time'], alarm_active,
                                   "Button is not pressed anymore", data['simulated'])
-        print(alarm_active)
         write_ds(write_api, data)
     elif topic == 'dus':
         write_dus(write_api, data)
     elif topic == 'pir':
         if 'RPIR' in data['name']:
             if users_inside == 0:
-                alarm_active = True
+                print('Ukljucen PIR')
 
+                alarm_active = True
+                mqtt_client.publish('alarm-on', json.dumps({'':''}), qos=1)
                 write_alarm_query(write_api, data['name'], data['_time'], alarm_active, data['name'] + ' detected movement.', data['simulated'])
             return
         query_data = []
@@ -128,6 +132,8 @@ def save_to_db(topic, data):
     elif topic == 'gsg':
         if data['suspicious'] is not None and data['suspicious'] == True:
             alarm_active = True
+            print('Ukljucen GSG')
+            mqtt_client.publish('alarm-on', json.dumps({'':''}), qos=1)
             write_alarm_query(write_api, data['name'], data['_time'], alarm_active, data['name'] + ' detected unusual values.', data['simulated'])
         write_db(write_api, data)
     elif topic == 'lcd' or topic == 'b4sd':
@@ -244,12 +250,6 @@ def deactivate_safety_system(pin):
     mqtt_client.publish('deactivate-safety-system', json.dumps({'pin':pin}), qos=1)
     return json.dumps({'response': 'Alarm successfully deactivated.'})
 
-@app.route('/simple_query', methods=['GET'])
-def retrieve_simple_data():
-    query = f"""from(bucket: "{bucket}")
-    |> range(start: -10m)
-    |> filter(fn: (r) => r._measurement == "Light")"""
-    return handle_influx_query(query)
 
 def activate_alarm():
     global clock_active, scheduled

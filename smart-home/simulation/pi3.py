@@ -49,7 +49,10 @@ def handle_message(topic, data):
         clock_event.set()
     elif topic == 'clock-stop':
         clock_event.clear()
-
+    elif topic == 'alarm-on':
+        alarm_event.set()
+    elif topic == 'alarm-off':
+        alarm_event.clear()
 def on_message(client, userdata, msg):
     handle_message(msg.topic, json.loads(msg.payload.decode('utf-8')))
 
@@ -66,7 +69,8 @@ if __name__ == "__main__":
 
         client.subscribe("clock-activate", qos=1)
         client.subscribe("clock-stop", qos=1)
-
+        client.subscribe("alarm-on", qos=1)
+        client.subscribe("alarm-off", qos=1)
 
     mqtt_client.on_connect = on_connect
     mqtt_client.on_message = on_message

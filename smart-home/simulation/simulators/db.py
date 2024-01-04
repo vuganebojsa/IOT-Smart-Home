@@ -9,7 +9,7 @@ def run_buzzer_simulator(callback, stop_event, settings, publish_event, clock_ev
             break
         is_bb = clock_event.is_set() and settings['name'] == 'BB'
         if is_bb or alarm_event.is_set():
-            print(settings['name'] + ' BUzzzing')
+            print(settings['name'] + ' Buzzzing')
             callback(settings, publish_event)
         time.sleep(1)
 
