@@ -29,5 +29,7 @@ export class SmarthomeService {
     return this.http.get<any>(this.url + 'get_alarm_status');
 
   }
-
+  change_rgb_color(button_pressed:string): Observable<any>{
+    return this.http.put<any>(this.url + 'rgb/' + button_pressed, {});
+  }
 }

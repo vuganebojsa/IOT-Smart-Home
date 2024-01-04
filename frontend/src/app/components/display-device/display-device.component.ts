@@ -40,7 +40,7 @@ export class DisplayDeviceComponent implements OnInit{
     else if(this.name == 'BB') return 'Buzz';
     else if(this.name == 'B4SD') return 'B4SD Time';
     else if(this.name == 'BIR') return 'Motion';
-    else if(this.name == 'BRGB') return 'Light';
+    else if(this.name == 'BRGB') return 'RGB';
     return '';
   }
 

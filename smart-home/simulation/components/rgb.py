@@ -22,7 +22,7 @@ def publisher_task(event, rgb_batch):
             publish_data_counter = 0
             rgb_batch.clear()
         publish.multiple(local_batch, hostname=HOSTNAME, port=PORT)
-        print(f'published {publish_data_limit} rgb values')
+        print(f'published {publish_data_limit} brgb values')
         event.clear()
 
 

@@ -167,8 +167,13 @@ def save_to_db(topic, data):
                             alarm_active = False
                             publish.single('system-off', json.dumps({'':''}), hostname=HOSTNAME, port=PORT)
                             publish.single('alarm-off', json.dumps({'':''}), hostname=HOSTNAME, port=PORT)
-    elif topic == 'bir' or topic == 'rgb':
+    elif topic == 'bir':
         write_db(write_api, data)
+    elif topic == 'rgb':
+        print('dosao ovde')
+        if data['measurement'] != 'Light':
+            print(data)
+            write_db(write_api, data)
 
 def handle_influx_query(query):
     try:
@@ -255,6 +260,12 @@ def get_last_measurement_data(name, devicename):
             return []
         else:
             return values['message']
+
+
+@app.route('/rgb/<string:button_pressed>', methods=['PUT'])
+def set_rgb_color(button_pressed):
+    publish.single('bir-button-pressed', json.dumps({'button': button_pressed}), hostname=HOSTNAME, port=PORT)
+    return {"status": "success"}
 
 
 def run_schedule():

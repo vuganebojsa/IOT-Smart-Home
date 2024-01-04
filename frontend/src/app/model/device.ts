@@ -7,3 +7,7 @@ export interface Device{
     simulated:boolean
 
 }
+export interface RgbColor{
+    colorName:string,
+    colorValue:string
+}

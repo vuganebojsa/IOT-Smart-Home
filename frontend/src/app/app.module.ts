@@ -16,6 +16,7 @@ import { DhtComponent } from './components/devices/dht/dht.component';
 import { DisplayDeviceComponent } from './components/display-device/display-device.component';
 import { DmsComponent } from './components/dms/dms.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RgbComponent } from './components/rgb/rgb.component';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     BrgbComponent,
     DhtComponent,
     DisplayDeviceComponent,
-    DmsComponent
+    DmsComponent,
+    RgbComponent
   ],
   imports: [
     BrowserModule,
