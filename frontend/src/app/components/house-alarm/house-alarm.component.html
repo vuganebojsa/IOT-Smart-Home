@@ -1,1 +1,6 @@
-<p>house-alarm works!</p>
+<div *ngIf="alarmStatus === true" class="row m-5 text-center">
+    <div class="col-12 mx-5">
+        <button type="button" (click)="deactivateButton()" class="button-style">Deactivate Alarm</button>
+
+    </div>
+</div>

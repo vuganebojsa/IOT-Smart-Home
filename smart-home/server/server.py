@@ -33,6 +33,7 @@ clock_active = False
 pin_lock = Lock()
 schedule_lock = Lock()
 system_lock = Lock()
+alarm_lock = Lock()
 current_pin = ''
 token = "RVjjgquNSWRWtAxukOBg2Eehcy1B6IfVSmhrWP5Et56-Yb5hItltIIe_bMGK6HJibZEQ9cBEQ7yd0QNXSRcPfg=="
 org = "FTN"
@@ -56,7 +57,9 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("lcd", qos=1)
     client.subscribe("gsg", qos=1)
     client.subscribe("b4sd", qos=1)
-
+    client.subscribe('alarm-on-server', qos=1)
+    client.subscribe('dms-entered-pin', qos=1)
+    
 
 
 
@@ -98,7 +101,6 @@ def save_to_db(topic, data):
     elif topic == 'pir':
         if 'RPIR' in data['name']:
             if users_inside == 0:
-                print('Ukljucen PIR')
 
                 alarm_active = True
                 mqtt_client.publish('alarm-on', json.dumps({'':''}), qos=1)
@@ -144,7 +146,25 @@ def save_to_db(topic, data):
         write_db(write_api, data)
     elif topic == 'lcd' or topic == 'b4sd':
         write_db(write_api, data)
-
+    elif topic == 'alarm-on-server':
+        alarm_active = True
+        mqtt_client.publish('alarm-on', json.dumps({'':''}), qos=1)
+    elif topic == 'dms-entered-pin':
+        global current_pin, schedule_safety, system_active
+        with system_lock:
+            if not system_active:
+                with pin_lock:
+                    with schedule_lock:
+                        current_pin = data['pin'][0:4]
+                        threading.Thread(target=run_schedule, daemon=True).start()
+            else:
+                with pin_lock:
+                    with system_lock:
+                        if current_pin == data['pin'][0:4]:
+                            system_active = False
+                            alarm_active = False
+                            publish.single('system-off', json.dumps({'':''}), hostname=HOSTNAME, port=PORT)
+                            publish.single('alarm-off', json.dumps({'':''}), hostname=HOSTNAME, port=PORT)
 
 def handle_influx_query(query):
     try:
@@ -269,7 +289,7 @@ def activate_safety_system(pin):
 
 @app.route('/deactivate-safety-system/<string:pin>', methods=['PUT'])
 def deactivate_safety_system(pin):
-    global current_pin, system_active
+    global current_pin, system_active, alarm_active
 
     with pin_lock:
         with system_lock:
@@ -285,9 +305,9 @@ def deactivate_safety_system(pin):
                 return json.dumps({'error': 'Incorrect pin. Try again'})
             system_active = False
     publish.single('system-off', json.dumps({'':''}), hostname=HOSTNAME, port=PORT)
+    alarm_active = False
     publish.single('alarm-off', json.dumps({'':''}), hostname=HOSTNAME, port=PORT)
 
-            # mqtt_client.publish('deactivate-safety-system', json.dumps({'pin':pin}), qos=1)
     return json.dumps({'response': 'Alarm successfully deactivated.'})
 
 def activate_alarm():
@@ -329,6 +349,22 @@ def stop_alarm():
         return jsonify({"message": "Clock stopped successfully"})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route('/get_alarm_status', methods=['GET'])
+def get_alarm_status():
+    global alarm_active
+    with alarm_lock:
+        return json.dumps({'status': alarm_active})
+
+@app.route('/deactivate-system_alarm', methods=['PUT'])
+def deactivate_system_alarm():
+    global alarm_active
+
+    with alarm_lock:
+        alarm_active = False
+        publish.single('alarm-off', json.dumps({'':''}), hostname=HOSTNAME, port=PORT)
+    return json.dumps({'response': 'Alarm successfully deactivated.'})
+
 
 if __name__ == '__main__':
     mqtt_client.connect("localhost", 1883, 60)

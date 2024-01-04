@@ -22,4 +22,12 @@ export class SmarthomeService {
   deactivate_system(pin:string): Observable<any>{
     return this.http.put<any>(this.url + 'deactivate-safety-system/' + pin, {});
   }
+  deactivate_system_alarm(): Observable<any>{
+    return this.http.put<any>(this.url + 'deactivate-system_alarm', {});
+  }
+  get_alarm_on(): Observable<any>{
+    return this.http.get<any>(this.url + 'get_alarm_status');
+
+  }
+
 }

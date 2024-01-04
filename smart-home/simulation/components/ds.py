@@ -34,7 +34,7 @@ def ds_callback(current_value, settings, publish_event, system_event):
 
     if current_value is True:
         if system_event.is_set():
-            publish.single('alarm-on', json.dumps({'':''}), hostname=HOSTNAME, port=PORT)
+            publish.single('alarm-on-server', json.dumps({'':''}), hostname=HOSTNAME, port=PORT)
         value = 1
         if past_value == False:
             button_pressed_time = time.time()

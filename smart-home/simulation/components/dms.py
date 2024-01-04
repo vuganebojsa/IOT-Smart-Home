@@ -41,6 +41,8 @@ def dms_callback(result, settings, publish_event):
             'value': result,
             '_time': formatted_time
     }
+    publish.single('dms-entered-pin', json.dumps({'pin': result}), hostname=HOSTNAME, port=PORT)
+
     with print_lock:
         dht_batch.append(('dms', json.dumps(payload), 0, True))
         publish_data_counter += 1
@@ -54,7 +56,7 @@ publisher_thread.start()
 
 def run_dms(settings, threads, stop_event):
         if settings['simulated']:
-            dms_thread = threading.Thread(target = run_dms_simulator, args=(5, dms_callback, stop_event, settings, publish_event))
+            dms_thread = threading.Thread(target = run_dms_simulator, args=(120, dms_callback, stop_event, settings, publish_event))
             dms_thread.start()
             threads.append(dms_thread)
         else:

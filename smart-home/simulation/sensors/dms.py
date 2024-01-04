@@ -45,16 +45,19 @@ def detect_motion(r1, r2, r3, r4, c1, c2, c3, c4, dms_callback, stop_event, sett
         GPIO.output(line, GPIO.LOW)
 
         return line
+    lines = ''
 
     while True:
         # call the readLine function for each row of the keypad
-        lines = ''
         lines += readLine(R1, ["1","2","3","A"])
         lines += readLine(R2, ["4","5","6","B"])
         lines += readLine(R3, ["7","8","9","C"])
         lines += readLine(R4, ["*","0","#","D"])
-        dms_callback(lines, settings, publish_event)
-        time.sleep(0.2)
+        # 5 bcz of #
+        if len(lines) == 5:
+            dms_callback(lines, settings, publish_event)
+            lines = ''
+        time.sleep(0.02)
         if stop_event.is_set():
             break
 
