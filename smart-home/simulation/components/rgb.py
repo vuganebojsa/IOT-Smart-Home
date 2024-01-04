@@ -29,7 +29,7 @@ def publisher_task(event, rgb_batch):
 def rgb_callback(settings, publish_event, button_pressed):
 
     global publish_data_counter, publish_data_limit
-    new_color = '' 
+    new_color = 'none' 
     if button_pressed == '0':
             new_color = 'none'
     elif button_pressed == '1':
