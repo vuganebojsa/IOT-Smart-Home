@@ -17,6 +17,30 @@ export class DmsComponent {
 
     }
   );
+  deactivateSystem(){
+    if(!this.pinForm.valid){
+      this.hasError = true;
+      const pinErrors = this.pinForm.controls.pin.errors;
+      if (pinErrors?.['pattern']) {
+        this.errorValue = 'Invalid format. Please enter 4 digits followed by an optional #.';
+      } else if (pinErrors?.['minlength']) {
+        this.errorValue = 'PIN must be at least 4 characters long.';
+      } else if (pinErrors?.['maxlength']) {
+        this.errorValue = 'PIN cannot be more than 5 characters long.';
+      }
+      return;
+    }
+    this.hasError = false;
+    this.service.deactivate_system(this.pinForm.value.pin).subscribe({
+      next:(res) =>{
+        this.snackbar.showSnackBar('Successfully deactivated system.', 'Ok');
+      },
+      error:(err) =>{
+        this.hasError = true;
+        this.errorValue = err.error;
+      }
+    })
+  }
   submit(){
     if(!this.pinForm.valid){
       this.hasError = true;
@@ -31,7 +55,7 @@ export class DmsComponent {
       return;
     }
     this.hasError = false;
-    this.service.enter_pin(this.pinForm.value.pin).subscribe({
+    this.service.activate_system(this.pinForm.value.pin).subscribe({
       next:(res) =>{
         this.snackbar.showSnackBar('Successfully set system pin. Wait 10 seconds for it to become active.', 'Ok');
       },

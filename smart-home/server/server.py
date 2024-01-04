@@ -228,7 +228,7 @@ def get_last_measurement_data(name, devicename):
 
 
 
-@app.route('/activate-safety-system/<string:pin>', methods=['PUT'])
+@app.route('/set_system_pin/<string:pin>', methods=['PUT'])
 def activate_safety_system(pin):
     if '#' in pin:
         if len(pin) != 5:
