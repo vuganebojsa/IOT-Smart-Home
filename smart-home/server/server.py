@@ -60,6 +60,7 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe('alarm-on-server', qos=1)
     client.subscribe('dms-entered-pin', qos=1)
     client.subscribe('bir', qos=1)
+    client.subscribe('rgb', qos=1)
     
 
 
@@ -166,7 +167,7 @@ def save_to_db(topic, data):
                             alarm_active = False
                             publish.single('system-off', json.dumps({'':''}), hostname=HOSTNAME, port=PORT)
                             publish.single('alarm-off', json.dumps({'':''}), hostname=HOSTNAME, port=PORT)
-    elif topic == 'bir':
+    elif topic == 'bir' or topic == 'rgb':
         write_db(write_api, data)
 
 def handle_influx_query(query):
