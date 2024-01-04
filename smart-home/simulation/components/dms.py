@@ -56,7 +56,7 @@ publisher_thread.start()
 
 def run_dms(settings, threads, stop_event):
         if settings['simulated']:
-            dms_thread = threading.Thread(target = run_dms_simulator, args=(120, dms_callback, stop_event, settings, publish_event))
+            dms_thread = threading.Thread(target = run_dms_simulator, args=(240, dms_callback, stop_event, settings, publish_event))
             dms_thread.start()
             threads.append(dms_thread)
         else:
