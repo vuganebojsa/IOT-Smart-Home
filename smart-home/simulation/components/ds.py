@@ -28,9 +28,6 @@ def publisher_task(event, dht_batch):
         event.clear()
 
 
-
-
-
 def ds_callback(current_value, settings,publish_event):
     global publish_data_counter, publish_data_limit, button_pressed_time, past_value, button_pressed_5_seconds
     if current_value is True:

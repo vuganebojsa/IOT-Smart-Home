@@ -14,6 +14,7 @@ import { DeviceInfoComponent } from './components/device-info/device-info.compon
 import { BrgbComponent } from './components/devices/brgb/brgb.component';
 import { DhtComponent } from './components/devices/dht/dht.component';
 import { DisplayDeviceComponent } from './components/display-device/display-device.component';
+import { DmsComponent } from './components/dms/dms.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { DisplayDeviceComponent } from './components/display-device/display-devi
     DeviceInfoComponent,
     BrgbComponent,
     DhtComponent,
-    DisplayDeviceComponent
+    DisplayDeviceComponent,
+    DmsComponent
   ],
   imports: [
     BrowserModule,
