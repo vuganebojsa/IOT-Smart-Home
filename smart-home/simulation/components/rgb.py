@@ -55,7 +55,7 @@ def rgb_callback(settings, publish_event, button_pressed):
 
     formatted_time = adjusted_datetime.isoformat()
     payload = {
-        'measurement': 'Light',
+        'measurement': 'RGB',
         'simulated': settings['simulated'],
         'runs_on': settings['runs_on'],
         'name': settings['name'],
