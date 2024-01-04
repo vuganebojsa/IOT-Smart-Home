@@ -9,6 +9,7 @@ import json
 from influx_writes import *
 import paho.mqtt.publish as publish
 import schedule
+from threading import Lock
 
 
 app = Flask(__name__)
@@ -27,7 +28,12 @@ users_inside = 0
 alarm_active = False
 system_active = False
 alarm_active_button = False
+schedule_safety = False
 clock_active = False
+pin_lock = Lock()
+schedule_lock = Lock()
+system_lock = Lock()
+current_pin = ''
 token = "RVjjgquNSWRWtAxukOBg2Eehcy1B6IfVSmhrWP5Et56-Yb5hItltIIe_bMGK6HJibZEQ9cBEQ7yd0QNXSRcPfg=="
 org = "FTN"
 url = "http://localhost:8086"
@@ -227,29 +233,59 @@ def get_last_measurement_data(name, devicename):
             return values['message']
 
 
+def run_schedule():
+    global current_pin, schedule_safety, system_active
+    with schedule_lock:
+        schedule_safety = True
+    time.sleep(10)
+    with schedule_lock:
+        schedule_safety = False
+    with system_lock:
+        system_active = True
 
 @app.route('/set_system_pin/<string:pin>', methods=['PUT'])
 def activate_safety_system(pin):
-    if '#' in pin:
-        if len(pin) != 5:
-            return json.dumps({'error': 'Pin should have 4 characters + #'})
-    else:
-        if len(pin) != 4:
-            return json.dumps({'error': 'Pin should have 4 characters'})
-    mqtt_client.publish('activate-safety-system', json.dumps({'pin':pin}), qos=1)
+    global current_pin, schedule_safety, system_active
+
+    with pin_lock:
+        with schedule_lock:
+            with system_lock:
+                if '#' in pin:
+                    if len(pin) != 5:
+                        return json.dumps({'error': 'Pin should have 4 characters + #'})
+                else:
+                    if len(pin) != 4:
+                        return json.dumps({'error': 'Pin should have 4 characters'})
+                current_pin = pin[0:4]
+                if system_active is True:
+                    return json.dumps({'error': 'Safety system is already active'})
+                if schedule_safety is True:
+                    return json.dumps({'error': 'Safety system scheduling in progress'})
+                else:
+                    threading.Thread(target=run_schedule, daemon=True).start()
+                # Additional logic (if any)
+    # mqtt_client.publish('activate-safety-system', json.dumps({'pin':current_pin}), qos=1)
     return json.dumps({'response': 'Alarm successfully activated'})
 
 @app.route('/deactivate-safety-system/<string:pin>', methods=['PUT'])
 def deactivate_safety_system(pin):
-    if '#' in pin:
-        if len(pin) != 5:
-            return json.dumps({'error': 'Pin should have 4 characters + #'})
-    else:
-        if len(pin) != 4:
-            return json.dumps({'error': 'Pin should have 4 characters'})
-    mqtt_client.publish('deactivate-safety-system', json.dumps({'pin':pin}), qos=1)
-    return json.dumps({'response': 'Alarm successfully deactivated.'})
+    global current_pin, system_active
 
+    with pin_lock:
+        with system_lock:
+            if system_active is False:
+                return json.dumps({'error': 'System is not active'})
+            if '#' in pin:
+                if len(pin) != 5:
+                    return json.dumps({'error': 'Pin should have 4 characters + #'})
+            else:
+                if len(pin) != 4:
+                    return json.dumps({'error': 'Pin should have 4 characters'})
+            if current_pin != pin[0:4]:
+                return json.dumps({'error': 'Incorrect pin. Try again'})
+            system_active = False
+            # mqtt_client.publish('deactivate-safety-system', json.dumps({'pin':pin}), qos=1)
+    return json.dumps({'response': 'Alarm successfully deactivated.'})
 
 def activate_alarm():
     global clock_active, scheduled

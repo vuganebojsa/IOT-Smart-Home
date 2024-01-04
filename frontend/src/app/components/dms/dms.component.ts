@@ -33,7 +33,13 @@ export class DmsComponent {
     this.hasError = false;
     this.service.deactivate_system(this.pinForm.value.pin).subscribe({
       next:(res) =>{
-        this.snackbar.showSnackBar('Successfully deactivated system.', 'Ok');
+        if(res['error']){
+          this.hasError = true;
+          this.errorValue = res['error'];
+        }else{
+          this.snackbar.showSnackBar('Successfully deactivated system.', 'Ok');
+
+        }
       },
       error:(err) =>{
         this.hasError = true;
@@ -56,9 +62,13 @@ export class DmsComponent {
     }
     this.hasError = false;
     this.service.activate_system(this.pinForm.value.pin).subscribe({
-      next:(res) =>{
-        this.snackbar.showSnackBar('Successfully set system pin. Wait 10 seconds for it to become active.', 'Ok');
-      },
+      next:(res) =>{ if(res['error']){
+        this.hasError = true;
+        this.errorValue = res['error'];
+      }else{
+        this.snackbar.showSnackBar('Successfully set system pin. Wait 10 seconds for it to be active.', 'Ok');
+
+      }},
       error:(err) =>{
         this.hasError = true;
         this.errorValue = err.error;
