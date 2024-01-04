@@ -3,7 +3,7 @@ import threading
 import time
 from locks.print_lock import print_lock
 from actuators.db import buzz
-
+from simulators.db import run_buzzer_simulator
 import paho.mqtt.publish as publish
 from broker_settings import HOSTNAME, PORT
 import json
@@ -55,15 +55,15 @@ publisher_thread = threading.Thread(target=publisher_task, args=(publish_event, 
 publisher_thread.daemon = True
 publisher_thread.start()
 
-def run_db(settings, threads, stop_event, code):
+def run_db(settings, threads, stop_event, code, clock_event, alarm_event):
         if settings['simulated']:
 
-            db_thread = threading.Thread(target=db_callback, args=(settings, publish_event))
+            db_thread = threading.Thread(target=run_buzzer_simulator, args=(db_callback, stop_event, settings, publish_event, clock_event, alarm_event))
             db_thread.start()
             threads.append(db_thread)
         else:
             pin =settings['pin']
-            db_thread = threading.Thread(target=buzz, args=(pin,db_callback, stop_event, settings, publish_event))
+            db_thread = threading.Thread(target=buzz, args=(pin,db_callback, stop_event, settings, publish_event, clock_event, alarm_event))
             db_thread.start()
             threads.append(db_thread)
             print(code + " loop started")

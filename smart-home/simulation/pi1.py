@@ -52,9 +52,9 @@ def run_dl_threads(settings, threads, stop_event):
     dl_settings = settings["DL"]
     run_dl(dl_settings, threads, stop_event, "DL")
 
-def run_db_threads(settings, threads, stop_event):
+def run_db_threads(settings, threads, stop_event, clock_event, alarm_event):
     db_settings = settings["DB"]
-    run_db(db_settings, threads, stop_event, "DB")
+    run_db(db_settings, threads, stop_event, "DB", clock_event, alarm_event)
 
 
 
@@ -86,12 +86,16 @@ def run_menu_thread(threads, stop_event):
     thread.start()
     threads.append(thread)
 
+alarm_event = threading.Event()
+clock_event = threading.Event()
 
 def handle_message(topic, data):
-    print(topic)
     if topic == 'dpir1-light-on':
          run_dl_threads(settings, threads, stop_event)
-
+    elif topic == 'clock-activate':
+        clock_event.set()
+    elif topic == 'clock-stop':
+        clock_event.clear()
 
 if __name__ == "__main__":
     # MQTT Configuration
@@ -104,8 +108,9 @@ if __name__ == "__main__":
     mqtt_client.loop_start()
 
     def on_connect(client, userdata, flags, rc):
-        print("cao")
         client.subscribe("dpir1-light-on")
+        client.subscribe("clock-activate", qos=1)
+        client.subscribe("clock-stop", qos=1)
 
 
     mqtt_client.on_connect = on_connect
@@ -119,6 +124,7 @@ if __name__ == "__main__":
         run_dpir_threads(settings, threads, stop_event)
         run_ds_threads(settings, threads, stop_event)
         run_dus_threads(settings, threads, stop_event)
+        run_db_threads(settings, threads, stop_event, clock_event, alarm_event)
         #run_dms_threads(settings, threads, stop_event)
         #run_menu_thread(threads, stop_event)
         while True:

@@ -20,7 +20,6 @@ def run_b4sd_simulator(delay, callback, stop_event, settings, publish_event, clo
                 is_empty = True
         else:
             time.sleep(delay)
-        print(value)
         callback(value, settings, publish_event)
         if stop_event.is_set():
             break

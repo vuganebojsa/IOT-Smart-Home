@@ -31,9 +31,9 @@ def run_bir_threads(settings, threads, stop_event):
 
     run_bir(bir_settings, threads, stop_event)
 
-def run_bb_threads(settings, threads, stop_event):
+def run_bb_threads(settings, threads, stop_event, clock_event, alarm_event):
     db_settings = settings["BB"]
-    run_db(db_settings, threads, stop_event, "BB")
+    run_db(db_settings, threads, stop_event, "BB", clock_event, alarm_event)
 
 
 def run_b4sd_threads(settings, threads, stop_event, clock_event):
@@ -41,11 +41,13 @@ def run_b4sd_threads(settings, threads, stop_event, clock_event):
 
     run_b4sd(bir_settings, threads, stop_event, clock_event)
 
+alarm_event = threading.Event()
+clock_event = threading.Event()
+
 def handle_message(topic, data):
     if topic == 'clock-activate':
         clock_event.set()
     elif topic == 'clock-stop':
-        print("Uslo je u stop")
         clock_event.clear()
 
 def on_message(client, userdata, msg):
@@ -56,7 +58,6 @@ if __name__ == "__main__":
     settings = load_settings('settingspi3.json')
     threads = []
     stop_event = threading.Event()
-    clock_event = threading.Event()
     pause_event = threading.Event()
     mqtt_client = mqtt.Client()
 
@@ -80,7 +81,7 @@ if __name__ == "__main__":
         run_bir_threads(settings, threads, stop_event)
         run_b4sd_threads(settings, threads, stop_event, clock_event)
 
-        run_bb_threads(settings, threads, stop_event)
+        run_bb_threads(settings, threads, stop_event, clock_event, alarm_event)
         while True:
             time.sleep(0.1)
     except KeyboardInterrupt:
