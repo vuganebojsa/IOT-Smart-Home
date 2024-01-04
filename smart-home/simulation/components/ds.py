@@ -11,6 +11,9 @@ from datetime import datetime, timedelta
 dht_batch = []
 publish_data_counter = 0
 publish_data_limit = 5
+button_pressed_time = None
+button_pressed_5_seconds = None
+past_value = False
 
 def publisher_task(event, dht_batch):
     global publish_data_counter, publish_data_limit
@@ -24,11 +27,32 @@ def publisher_task(event, dht_batch):
         print(f'published {publish_data_limit} ds values')
         event.clear()
 
+
+
+
+
 def ds_callback(current_value, settings,publish_event):
-    global publish_data_counter, publish_data_limit
-    value = 0
+    global publish_data_counter, publish_data_limit, button_pressed_time, past_value, button_pressed_5_seconds
     if current_value is True:
         value = 1
+        if past_value == False:
+            button_pressed_time = time.time()
+            past_value = True
+    else:
+        value = 0
+        if past_value == True:
+            button_pressed_time = None
+            past_value = False
+            if button_pressed_5_seconds:
+                button_pressed_5_seconds = False
+
+    if button_pressed_time is not None and (time.time() - button_pressed_time) > 5 and not button_pressed_5_seconds :
+        button_pressed_5_seconds = True
+
+
+
+    if button_pressed_time is not None:
+        print(time.time() - button_pressed_time)
     current_datetime = datetime.now()
 
     adjusted_datetime = current_datetime - timedelta(hours=1)
@@ -40,7 +64,8 @@ def ds_callback(current_value, settings,publish_event):
         'runs_on': settings['runs_on'],
         'name': settings['name'],
         'value': value,
-        '_time': formatted_time
+        '_time': formatted_time,
+        'alarm':button_pressed_5_seconds
     }
     with print_lock:
         dht_batch.append(('ds', json.dumps(payload), 0, True))
@@ -57,7 +82,7 @@ publisher_thread.start()
 
 def run_ds(settings, threads, stop_event, code):
         if settings['simulated']:
-            ds_thread = threading.Thread(target = run_ds_simulator, args=(5, ds_callback, stop_event, settings, publish_event))
+            ds_thread = threading.Thread(target = run_ds_simulator, args=(1, ds_callback, stop_event, settings, publish_event))
             ds_thread.start()
             threads.append(ds_thread)
             print(code + " sumilator started\n")

@@ -1,3 +1,6 @@
+import threading
+import time
+
 from flask import Flask, jsonify, request
 from influxdb_client import InfluxDBClient, Point
 from influxdb_client.client.write_api import SYNCHRONOUS
@@ -5,8 +8,14 @@ import paho.mqtt.client as mqtt
 import json
 from influx_writes import *
 import paho.mqtt.publish as publish
+from flask_cors import CORS
+import schedule
+
+
 app = Flask(__name__)
+CORS(app)
 mqtt_client = mqtt.Client()
+
 
 @app.after_request
 def add_cors_headers(response):
@@ -19,14 +28,16 @@ def add_cors_headers(response):
 users_inside = 0
 alarm_active = False
 system_active = False
-token = "g7NJVRHodhza0U5BLCtEnqBxbWiwBYh_a-6MndQ6DQFCHqISWhI6TlqlHZ9s586yoTrbR-026oIUzeRD3jLt3A=="
+alarm_active_button = False
+clock_active = False
+token = "kw71CyjVbIlWpLtIXqWBTAnKGGKgOeT4UANgRNdnJOZJsT0k70IUXAQG0JXV_nqyk8-PpVdaAKEfM3CvkYTa7A=="
 org = "FTN"
 url = "http://localhost:8086"
 bucket = "iot_smart_home"
 influxdb_client = InfluxDBClient(url=url, token=token, org=org)
 HOSTNAME = "localhost"
 PORT = 1883
-
+scheduled = False
 # MQTT Configuration
 
 def on_connect(client, userdata, flags, rc):
@@ -48,6 +59,7 @@ def on_connect(client, userdata, flags, rc):
 def save_to_db(topic, data):
     global users_inside
     global alarm_active
+    global  alarm_active_button
     write_api = influxdb_client.write_api(write_options=SYNCHRONOUS)
     if topic == 'dht':
 
@@ -59,6 +71,21 @@ def save_to_db(topic, data):
     elif topic == 'dms':
         write_dms(write_api, data)
     elif topic == 'ds':
+        if data['alarm'] is not None and data['alarm'] == True:
+            if alarm_active_button != True:
+                print("UKLJUCIO")
+                alarm_active = True
+                alarm_active_button = True
+                write_alarm_query(write_api, data['name'], data['_time'], alarm_active,
+                              "Button is not pressed for more than 5 seconds", data['simulated'])
+        elif data['alarm'] is not None and data['alarm'] == False:
+            if alarm_active_button != False:
+                print("ISKLJUCIO")
+                alarm_active = False
+                alarm_active_button = False
+                write_alarm_query(write_api, data['name'], data['_time'], alarm_active,
+                                  "Button is not pressed anymore", data['simulated'])
+        print(alarm_active)
         write_ds(write_api, data)
     elif topic == 'dus':
         write_dus(write_api, data)
@@ -66,6 +93,7 @@ def save_to_db(topic, data):
         if 'RPIR' in data['name']:
             if users_inside == 0:
                 alarm_active = True
+
                 write_alarm_query(write_api, data['name'], data['_time'], alarm_active, data['name'] + ' detected movement.', data['simulated'])
             return
         query_data = []
@@ -225,6 +253,45 @@ def retrieve_simple_data():
     |> filter(fn: (r) => r._measurement == "Light")"""
     return handle_influx_query(query)
 
+def activate_alarm():
+    global clock_active, scheduled
+    clock_active = True
+    scheduled = False
+    publish.single('clock-activate', json.dumps({'clock':'on'}), hostname=HOSTNAME, port=PORT)
+
+    print("Alarm activated! Ovde pozovite određenu funkciju.")
+@app.route('/set_alarm', methods=['POST'])
+def set_alarm():
+    global scheduled
+    try:
+        data = request.get_json()
+        alarm_time = data.get("alarm_time")
+        print(f"Postavljen alarm za: {alarm_time}")
+        if not scheduled:
+            alarm_time_obj = datetime.strptime(alarm_time, "%H:%M").time()
+            print(alarm_time_obj.strftime("%H:%M"))
+            schedule.every().day.at(alarm_time_obj.strftime("%H:%M")).do(activate_alarm)
+            scheduled = True
+        def run_schedule():
+            while scheduled is True:
+                schedule.run_pending()
+                time.sleep(1)
+        threading.Thread(target=run_schedule, daemon=True).start()
+
+        return jsonify({"message": "Alarm set successfully"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/stop_alarm', methods=['POST'])
+def stop_alarm():
+    global clock_active
+    try:
+
+        publish.single('clock-stop', json.dumps({'clock': 'off'}), hostname=HOSTNAME, port=PORT)
+        clock_active = False
+        return jsonify({"message": "Clock stopped successfully"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     mqtt_client.connect("localhost", 1883, 60)

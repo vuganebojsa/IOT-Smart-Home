@@ -50,16 +50,16 @@ publisher_thread = threading.Thread(target=publisher_task, args=(publish_event, 
 publisher_thread.daemon = True
 publisher_thread.start()
 
-def run_b4sd(settings, threads, stop_event):
+def run_b4sd(settings, threads, stop_event, clock_event):
         if settings['simulated']:
             dpir_thread = threading.Thread(target=run_b4sd_simulator,
-                                          args=(5, b4sd_callback, stop_event, settings, publish_event))
+                                          args=(5, b4sd_callback, stop_event, settings, publish_event, clock_event))
             dpir_thread.start()
             threads.append(dpir_thread)
         else:
             from displays.b4sd import run
             pin = settings['pin']
             dpir_thread = threading.Thread(target=run,
-                                          args=(b4sd_callback, stop_event, settings, publish_event))
+                                          args=(b4sd_callback, stop_event, settings, publish_event, clock_event))
             dpir_thread.start()
             threads.append(dpir_thread)
