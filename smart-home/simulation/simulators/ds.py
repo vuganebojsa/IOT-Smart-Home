@@ -13,11 +13,10 @@ def generate_value():
         yield current_state
 
 
-def run_ds_simulator(delay, callback, stop_event, settings, publish_event):
-
+def run_ds_simulator(delay, callback, stop_event, settings, publish_event, system_event):
 
     for motion in generate_value():
         time.sleep(delay)
-        callback(motion, settings, publish_event)
+        callback(motion, settings, publish_event, system_event)
         if stop_event.is_set():
             break

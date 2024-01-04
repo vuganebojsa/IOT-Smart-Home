@@ -28,9 +28,13 @@ def publisher_task(event, dht_batch):
         event.clear()
 
 
-def ds_callback(current_value, settings,publish_event):
+def ds_callback(current_value, settings, publish_event, system_event):
     global publish_data_counter, publish_data_limit, button_pressed_time, past_value, button_pressed_5_seconds
+
+
     if current_value is True:
+        if system_event.is_set():
+            publish.single('alarm-on', json.dumps({'':''}), hostname=HOSTNAME, port=PORT)
         value = 1
         if past_value == False:
             button_pressed_time = time.time()
@@ -77,9 +81,9 @@ publisher_thread = threading.Thread(target=publisher_task, args=(publish_event, 
 publisher_thread.daemon = True
 publisher_thread.start()
 
-def run_ds(settings, threads, stop_event, code):
+def run_ds(settings, threads, stop_event, code, system_event):
         if settings['simulated']:
-            ds_thread = threading.Thread(target = run_ds_simulator, args=(1, ds_callback, stop_event, settings, publish_event))
+            ds_thread = threading.Thread(target = run_ds_simulator, args=(1, ds_callback, stop_event, settings, publish_event, system_event))
             ds_thread.start()
             threads.append(ds_thread)
             print(code + " sumilator started\n")
@@ -87,6 +91,6 @@ def run_ds(settings, threads, stop_event, code):
             from sensors.ds import press_button
             pin = settings['pin']
             ds_thread = threading.Thread(target=press_button,
-                                          args=(pin, ds_callback, stop_event, settings, publish_event))
+                                          args=(pin, ds_callback, stop_event, settings, publish_event, system_event))
             ds_thread.start()
             threads.append(ds_thread)

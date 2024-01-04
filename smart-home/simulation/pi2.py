@@ -22,6 +22,7 @@ try:
 except:
     pass
 
+system_event = threading.Event()
 
 def run_dht_threads(settings, threads, stop_event):
     gdht1_settings = settings['GDHT']
@@ -40,9 +41,9 @@ def run_dpir_threads(settings, threads, stop_event):
 
     run_pir(dpir2_settings, threads, stop_event)
 
-def run_ds_threads(settings, threads, stop_event):
+def run_ds_threads(settings, threads, stop_event, system_event):
     ds2_settings = settings['DS2']
-    run_ds(ds2_settings, threads, stop_event, 'DS2')
+    run_ds(ds2_settings, threads, stop_event, 'DS2', system_event)
 
 def run_dus_threads(settings, threads, stop_event):
     dus2_settings = settings['DUS2']
@@ -61,6 +62,10 @@ def handle_message(topic, data):
     if topic == 'dht-lcd-display':
         temperature_str = data["temperature"]
         run_lcd_threads(settings,threads, stop_event, temperature_str)
+    elif topic == 'system-on':
+        system_event.set()
+    elif topic == 'system-off':
+        system_event.clear()
 
 def on_message(client, userdata, msg):
     handle_message(msg.topic, json.loads(msg.payload.decode('utf-8')))
@@ -75,9 +80,9 @@ if __name__ == "__main__":
     mqtt_client = mqtt.Client()
 
     def on_connect(client, userdata, flags, rc):
-
         client.subscribe("dht-lcd-display", qos=1)
-
+        client.subscribe("system-on", qos=1)
+        client.subscribe("system-off", qos=1)
     mqtt_client.on_connect = on_connect
     mqtt_client.on_message = on_message
 
@@ -90,7 +95,7 @@ if __name__ == "__main__":
         run_dht_threads(settings, threads, stop_event)
         run_pir_threads(settings, threads, stop_event)
         run_dpir_threads(settings, threads, stop_event)
-        run_ds_threads(settings, threads, stop_event)
+        run_ds_threads(settings, threads, stop_event, system_event)
         run_dus_threads(settings, threads, stop_event)
         run_gsc_threads(settings, threads,  stop_event)
         # run_lcd_threads(settings,threads,stop_event)

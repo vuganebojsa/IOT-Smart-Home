@@ -36,9 +36,9 @@ def run_dpir_threads(settings, threads, stop_event):
 
     run_pir(dpir1_settings, threads, stop_event)
 
-def run_ds_threads(settings, threads, stop_event):
+def run_ds_threads(settings, threads, stop_event, system_event):
     ds1_settings = settings['DS1']
-    run_ds(ds1_settings, threads, stop_event, 'DS1')
+    run_ds(ds1_settings, threads, stop_event, 'DS1', system_event)
 
 def run_dus_threads(settings, threads, stop_event):
     dus1_settings = settings['DUS1']
@@ -88,7 +88,7 @@ def run_menu_thread(threads, stop_event):
 
 alarm_event = threading.Event()
 clock_event = threading.Event()
-
+system_event = threading.Event()
 def handle_message(topic, data):
     if topic == 'dpir1-light-on':
          run_dl_threads(settings, threads, stop_event)
@@ -100,6 +100,10 @@ def handle_message(topic, data):
         alarm_event.set()
     elif topic == 'alarm-off':
         alarm_event.clear()
+    elif topic == 'system-on':
+        system_event.set()
+    elif topic == 'system-off':
+        system_event.clear()
 
 if __name__ == "__main__":
     # MQTT Configuration
@@ -117,6 +121,9 @@ if __name__ == "__main__":
         client.subscribe("clock-stop", qos=1)
         client.subscribe("alarm-on", qos=1)
         client.subscribe("alarm-off", qos=1)
+        client.subscribe("system-on", qos=1)
+        client.subscribe("system-off", qos=1)
+        #system-on
 
 
     mqtt_client.on_connect = on_connect
@@ -128,7 +135,7 @@ if __name__ == "__main__":
         run_dht_threads(settings, threads, stop_event)
         run_pir_threads(settings, threads, stop_event)
         run_dpir_threads(settings, threads, stop_event)
-        run_ds_threads(settings, threads, stop_event)
+        run_ds_threads(settings, threads, stop_event, system_event)
         run_dus_threads(settings, threads, stop_event)
         run_db_threads(settings, threads, stop_event, clock_event, alarm_event)
         #run_dms_threads(settings, threads, stop_event)

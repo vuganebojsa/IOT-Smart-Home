@@ -238,6 +238,8 @@ def run_schedule():
     with schedule_lock:
         schedule_safety = True
     time.sleep(10)
+    publish.single('system-on', json.dumps({'':''}), hostname=HOSTNAME, port=PORT)
+
     with schedule_lock:
         schedule_safety = False
     with system_lock:
@@ -263,8 +265,6 @@ def activate_safety_system(pin):
                     return json.dumps({'error': 'Safety system scheduling in progress'})
                 else:
                     threading.Thread(target=run_schedule, daemon=True).start()
-                # Additional logic (if any)
-    # mqtt_client.publish('activate-safety-system', json.dumps({'pin':current_pin}), qos=1)
     return json.dumps({'response': 'Alarm successfully activated'})
 
 @app.route('/deactivate-safety-system/<string:pin>', methods=['PUT'])
@@ -284,6 +284,9 @@ def deactivate_safety_system(pin):
             if current_pin != pin[0:4]:
                 return json.dumps({'error': 'Incorrect pin. Try again'})
             system_active = False
+    publish.single('system-off', json.dumps({'':''}), hostname=HOSTNAME, port=PORT)
+    publish.single('alarm-off', json.dumps({'':''}), hostname=HOSTNAME, port=PORT)
+
             # mqtt_client.publish('deactivate-safety-system', json.dumps({'pin':pin}), qos=1)
     return json.dumps({'response': 'Alarm successfully deactivated.'})
 
