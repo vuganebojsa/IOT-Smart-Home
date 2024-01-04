@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { SnackbarService } from 'src/app/services/snackbar.service';
 import { HttpClient } from '@angular/common/http';
+import { SmarthomeService } from 'src/app/services/smarthome.service';
 @Component({
   selector: 'app-alarm-clock',
   templateUrl: './alarm-clock.component.html',
@@ -8,7 +9,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class AlarmClockComponent {
 
-  constructor(private snackBar:SnackbarService, private httpClient: HttpClient) {}
+  constructor(private snackBar:SnackbarService, private httpClient: HttpClient, private service: SmarthomeService) {}
   selectedTime: string = '';
   errorMessage = false;
   onTimeSet(event: any) {
@@ -42,6 +43,14 @@ export class AlarmClockComponent {
         this.snackBar.showSnackBar('Error setting alarm', 'Ok');
       }
     );
+  }
+  turnOffClock(){
+    this.service.stop_clock().subscribe({
+      next:(res) =>{
+        this.snackBar.showSnackBar('Alarm stopped', 'Ok');
+
+      }
+    })
   }
 
 }

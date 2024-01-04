@@ -8,12 +8,10 @@ import paho.mqtt.client as mqtt
 import json
 from influx_writes import *
 import paho.mqtt.publish as publish
-from flask_cors import CORS
 import schedule
 
 
 app = Flask(__name__)
-CORS(app)
 mqtt_client = mqtt.Client()
 
 
@@ -30,7 +28,7 @@ alarm_active = False
 system_active = False
 alarm_active_button = False
 clock_active = False
-token = "kw71CyjVbIlWpLtIXqWBTAnKGGKgOeT4UANgRNdnJOZJsT0k70IUXAQG0JXV_nqyk8-PpVdaAKEfM3CvkYTa7A=="
+token = "RVjjgquNSWRWtAxukOBg2Eehcy1B6IfVSmhrWP5Et56-Yb5hItltIIe_bMGK6HJibZEQ9cBEQ7yd0QNXSRcPfg=="
 org = "FTN"
 url = "http://localhost:8086"
 bucket = "iot_smart_home"
@@ -71,7 +69,7 @@ def save_to_db(topic, data):
     elif topic == 'dms':
         write_dms(write_api, data)
     elif topic == 'ds':
-        if data['alarm'] is not None and data['alarm'] == True:
+        if 'alarm' in data and data['alarm'] == True:
             if alarm_active_button != True:
                 print("UKLJUCIO")
                 alarm_active = True

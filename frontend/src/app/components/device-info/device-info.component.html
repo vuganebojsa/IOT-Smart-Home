@@ -1,18 +1,17 @@
 <div class="row text-center my-3">
     <div class="col-12">
-        <h2>{{this.deviceName}}</h2>
+        <h2>Device Name: {{this.deviceName}}</h2>
     </div>
 </div>
 
 <div class="row mx-2 text-center">
     <div class="col-12">
-        <h4>Measurements</h4>
+        <h2>Measurements</h2>
     </div>
 </div>
 <div class="row mx-2 text-center">
     
     <div class="col-6" *ngFor="let measure of measurements">
-       <h6>Device Name: {{measure.name}}</h6>
        <h6>Measurement: {{measure._measurement}}</h6>
        <h6>Measurement value: {{measure._value}}</h6>
        <h6>Time of Measurement: {{measure._time | date:'dd/MM/yyyy HH:mm'}}</h6>

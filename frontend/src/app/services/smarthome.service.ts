@@ -12,4 +12,8 @@ export class SmarthomeService {
   get_last_measurement(measurement:string, device:string): Observable<any>{
     return this.http.get<any>(this.url + 'measurement/' + measurement + '/' + device);
   }
+
+  stop_clock(): Observable<any>{
+    return this.http.post<any>(this.url + 'stop_alarm', {});
+  }
 }
