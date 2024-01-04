@@ -114,7 +114,7 @@ if __name__ == "__main__":
     print('Starting app')
     
     try:
-        #run_dht_threads(settings, threads, stop_event)
+        run_dht_threads(settings, threads, stop_event)
         run_pir_threads(settings, threads, stop_event)
         run_dpir_threads(settings, threads, stop_event)
         run_ds_threads(settings, threads, stop_event)

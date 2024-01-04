@@ -14,7 +14,15 @@ import schedule
 
 app = Flask(__name__)
 CORS(app)
+mqtt_client = mqtt.Client()
 
+
+@app.after_request
+def add_cors_headers(response):
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+    response.headers['Access-Control-Allow-Methods'] = 'OPTIONS, HEAD, GET, POST, PUT, DELETE'
+    return response
 
 # InfluxDB Configuration
 users_inside = 0
@@ -142,6 +150,101 @@ def handle_influx_query(query):
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
+@app.route('/measurement/<string:name>/<string:devicename>', methods=['GET'])
+def get_last_measurement_data(name, devicename):
+
+    if name == 'dht':
+        values = []
+        query = f"""from(bucket: "{bucket}")
+        |> range(start: -25m)
+        |> filter(fn: (r) => r._measurement == "Temperature")
+        |> filter(fn: (r) => r["name"] == "{devicename}")
+        |> sort(columns: ["_time"], desc: true)
+        |> limit(n: 1)
+        """
+        temperature = handle_influx_query(query)
+        if 'error' not in temperature:
+            if len(temperature['data']) > 0:
+                values.append(temperature['data'][0])
+        query = f"""from(bucket: "{bucket}")
+        |> range(start: -25m)
+        |> filter(fn: (r) => r._measurement == "Humidity")
+        |> filter(fn: (r) => r["name"] == "{devicename}")
+        |> sort(columns: ["_time"], desc: true)
+        |> limit(n: 1)
+        """
+        humidity = handle_influx_query(query)
+        if 'error' not in humidity:
+            if len(humidity['data']) > 0:
+                values.append(humidity['data'][0])
+        return values
+
+    elif name == 'gyro':
+        values = []
+        query = f"""from(bucket: "{bucket}")
+        |> range(start: -25m)
+        |> filter(fn: (r) => r._measurement == "Accelerator")
+        |> filter(fn: (r) => r["name"] == "{devicename}")
+        |> sort(columns: ["_time"], desc: true)
+        |> limit(n: 1)
+        """
+        accelerator = handle_influx_query(query)
+        if 'error' not in accelerator:
+            if len(accelerator['data']) > 0:
+                values.append(accelerator['data'][0])
+        query = f"""from(bucket: "{bucket}")
+        |> range(start: -25m)
+        |> filter(fn: (r) => r._measurement == "Gyroscope")
+        |> filter(fn: (r) => r["name"] == "{devicename}")
+        |> sort(columns: ["_time"], desc: true)
+        |> limit(n: 1)
+        """
+        gyroscope = handle_influx_query(query)
+        if 'error' not in gyroscope:
+            if len(gyroscope['data']) > 0:
+                values.append(gyroscope['data'][0])
+        
+        return values
+
+    else:
+        query = f"""from(bucket: "{bucket}")
+        |> range(start: -25m)
+        |> filter(fn: (r) => r._measurement == "{name}")
+        |> filter(fn: (r) => r["name"] == "{devicename}")
+        |> sort(columns: ["_time"], desc: true)
+        |> limit(n: 1)
+        """
+        values = handle_influx_query(query)
+        if 'error' not in values:
+            if len(values['data']) > 0:
+                return values['data']
+            return []
+        else:
+            return values['message']
+
+
+
+@app.route('/activate-safety-system/<string:pin>', methods=['PUT'])
+def activate_safety_system(pin):
+    if '#' in pin:
+        if len(pin) != 5:
+            return json.dumps({'error': 'Pin should have 4 characters + #'})
+    else:
+        if len(pin) != 4:
+            return json.dumps({'error': 'Pin should have 4 characters'})
+    mqtt_client.publish('activate-safety-system', json.dumps({'pin':pin}), qos=1)
+    return json.dumps({'response': 'Alarm successfully activated'})
+
+@app.route('/deactivate-safety-system/<string:pin>', methods=['PUT'])
+def deactivate_safety_system(pin):
+    if '#' in pin:
+        if len(pin) != 5:
+            return json.dumps({'error': 'Pin should have 4 characters + #'})
+    else:
+        if len(pin) != 4:
+            return json.dumps({'error': 'Pin should have 4 characters'})
+    mqtt_client.publish('deactivate-safety-system', json.dumps({'pin':pin}), qos=1)
+    return json.dumps({'response': 'Alarm successfully deactivated.'})
 
 @app.route('/simple_query', methods=['GET'])
 def retrieve_simple_data():
@@ -191,7 +294,6 @@ def stop_alarm():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    mqtt_client = mqtt.Client()
     mqtt_client.connect("localhost", 1883, 60)
     mqtt_client.loop_start()
     
