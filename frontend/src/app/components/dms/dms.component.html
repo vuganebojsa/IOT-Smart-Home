@@ -1,1 +1,23 @@
-<p>dms works!</p>
+<div class="row mx-3">
+    <div class="col-12 ">
+
+        <h2>
+            Activate Safety System via Pin Code
+        </h2>
+        <form login [formGroup]="pinForm" (ngSubmit)="submit()" class="p-3" style="max-width: 300px;">
+            <div class="alert alert-danger" role="alert" *ngIf="hasError">
+                {{errorValue}}
+              </div>
+            <div class="mb-3 ">
+                <label for="pin" class="col-form-label text-light">Enter Pin Code (4 numbers)</label>
+
+                <input type="text" class="form-control" name="pin" id="pin" placeholder="1234#" formControlName="pin">
+            </div>
+
+            <div class="mb-3">
+                <button type="submit" class="button-style" id="confirmRegistration">Set System Pin</button>
+            </div>
+
+        </form>
+    </div>
+</div>

@@ -15,6 +15,7 @@ import { BrgbComponent } from './components/devices/brgb/brgb.component';
 import { DhtComponent } from './components/devices/dht/dht.component';
 import { DisplayDeviceComponent } from './components/display-device/display-device.component';
 import { DmsComponent } from './components/dms/dms.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -35,7 +36,9 @@ import { DmsComponent } from './components/dms/dms.component';
     BrowserAnimationsModule,
     NgxMaterialTimepickerModule,
     MatSnackBarModule,
-    HttpClientModule
+    HttpClientModule,
+    ReactiveFormsModule,
+    FormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

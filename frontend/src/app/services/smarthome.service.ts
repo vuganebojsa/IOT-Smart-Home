@@ -16,4 +16,7 @@ export class SmarthomeService {
   stop_clock(): Observable<any>{
     return this.http.post<any>(this.url + 'stop_alarm', {});
   }
+  enter_pin(pin:string): Observable<any>{
+    return this.http.post<any>(this.url + 'set_system_pin', {'pin':pin});
+  }
 }
