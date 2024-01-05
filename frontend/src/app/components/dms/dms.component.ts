@@ -13,7 +13,7 @@ export class DmsComponent {
   errorValue = '';
   pinForm = new FormGroup(
     {
-      pin: new FormControl('', [Validators.pattern(/^\d{4}(#)?$/), Validators.minLength(4), Validators.maxLength(5)])
+      pin: new FormControl('', [Validators.pattern(/^\d{4}(#)?$/), Validators.minLength(4), Validators.maxLength(5), Validators.required])
 
     }
   );
