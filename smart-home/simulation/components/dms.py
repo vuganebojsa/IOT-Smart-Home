@@ -40,7 +40,7 @@ def dms_callback(result, settings, publish_event):
             'value': result,
             '_time': formatted_time
     }
-    # publish.single('dms-entered-pin', json.dumps({'pin': result}), hostname=HOSTNAME, port=PORT)
+    publish.single('dms-entered-pin', json.dumps({'pin': result}), hostname=HOSTNAME, port=PORT)
 
     with print_lock:
         dht_batch.append(('dms', json.dumps(payload), 0, True))
