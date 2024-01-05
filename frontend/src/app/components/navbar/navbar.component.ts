@@ -14,6 +14,7 @@ export class NavbarComponent implements OnInit{
   constructor(private websocketService: WebsocketService) {}
 
   ngOnInit(): void {
+
     this.websocketService.listen('message_from_server').subscribe((message: string) => {
       this.receivedMessage = message;
       console.log(this.receivedMessage)

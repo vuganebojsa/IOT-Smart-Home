@@ -44,7 +44,7 @@ schedule_lock = Lock()
 system_lock = Lock()
 alarm_lock = Lock()
 current_pin = ''
-token = "DWQVlWsA7hLnqCCbeBEpfwDRmxFlTinUZe7FfXtdDuQAn854-QQWVtTpcOpVxj0KBCZYK-NWtfmq7l9QeuXueQ=="
+token = "XEtDJi77ZmaQF9ZVdivA1MBUBCOtVQN_fVkYaFejPx7ZpTL9vSNv4PDhvTE_xqA2HpMU7exex_AvIlJu-CFJAQ=="
 org = "FTN"
 url = "http://localhost:8086"
 bucket = "iot_smart_home"
