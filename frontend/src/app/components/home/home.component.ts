@@ -7,11 +7,9 @@ import { Socket } from 'ngx-socket-io';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent implements OnInit, OnDestroy{
-  constructor(private route: Router, private socket: Socket){}
-  alarmStatus:any;
-  ngOnDestroy(): void {
-  }
+export class HomeComponent implements OnInit{
+  constructor(private route: Router){}
+ 
   ngOnInit(): void {
 
   }
