@@ -125,7 +125,7 @@ def write_dl(write_api, data):
         )
         write_api.write(bucket=bucket_influx, org=org_influx, record=point)
 
-def write_users_inside(write_api, current_count):
+def write_users_inside(write_api, current_count, action):
     current_datetime = datetime.now()
 
     adjusted_datetime = current_datetime - timedelta(hours=1)
@@ -133,6 +133,7 @@ def write_users_inside(write_api, current_count):
     formatted_time = adjusted_datetime.isoformat()
     point = (
         Point('Users')
+        .tag('action', action)
         .field("measurement", current_count)
         .time(formatted_time)
     )

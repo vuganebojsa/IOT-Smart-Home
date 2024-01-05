@@ -113,7 +113,8 @@ def save_to_db(topic, data):
             |> range(start: -40s)
             |> filter(fn: (r) => r._measurement == "Distance")
             |> filter(fn: (r) => r["name"] == "DUS1")
-            |> limit(n: 2)"""
+            |> sort(columns: ["_time"], desc: true)
+            |> limit(n: 3)"""
             query_data = handle_influx_query(query)
             publish.single('dpir1-light-on', json.dumps({'light':'on'}), hostname=HOSTNAME, port=PORT)
         elif data['name'] == 'DPIR2':
@@ -121,19 +122,25 @@ def save_to_db(topic, data):
             |> range(start: -40s)
             |> filter(fn: (r) => r._measurement == "Distance")
             |> filter(fn: (r) => r["name"] == "DUS2")
-            |> limit(n: 2)"""
+            |> sort(columns: ["_time"], desc: true)
+            |> limit(n: 3)"""
             query_data = handle_influx_query(query)
         is_entering = False
-        if len(query_data['data']) > 1:
-            if query_data['data'][0]['_value'] > query_data['data'][1]['_value']:
+        if len(query_data['data']) > 2:
+            if query_data['data'][0]['_value'] > query_data['data'][2]['_value']:
                 is_entering = True
             if is_entering:
                 users_inside += 1
+                write_users_inside(write_api, users_inside, 'user entered')
+
             else:
                 users_inside -= 1
+                if users_inside < 0:
+                    users_inside = 0
+                write_users_inside(write_api, users_inside, 'user left')
+
         if users_inside < 0:
             users_inside = 0
-        write_users_inside(write_api, users_inside)
         write_pir(write_api, data)
     elif topic == 'db':
         write_db(write_api, data)
