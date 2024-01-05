@@ -1,7 +1,7 @@
 import threading
 import time
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 from influxdb_client import InfluxDBClient, Point
 from influxdb_client.client.write_api import SYNCHRONOUS
 import paho.mqtt.client as mqtt
@@ -10,12 +10,21 @@ from influx_writes import *
 import paho.mqtt.publish as publish
 import schedule
 from threading import Lock
-
-
+from flask_socketio import SocketIO, emit
+from flask_cors import CORS
 app = Flask(__name__)
 mqtt_client = mqtt.Client()
+CORS(app)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
-
+@socketio.on('connect')
+def handle_connect(msg):
+    print('Client connected')
+    socketio.emit('message_from_server', 'Hello from the server!', namespace='/')
+    send_message_to_client(msg)
+def send_message_to_client(message):
+    # Make sure to use the same namespace if specified
+    socketio.emit('message_from_server', message, namespace='/')
 @app.after_request
 def add_cors_headers(response):
     response.headers['Access-Control-Allow-Origin'] = '*'
@@ -35,7 +44,7 @@ schedule_lock = Lock()
 system_lock = Lock()
 alarm_lock = Lock()
 current_pin = ''
-token = "RVjjgquNSWRWtAxukOBg2Eehcy1B6IfVSmhrWP5Et56-Yb5hItltIIe_bMGK6HJibZEQ9cBEQ7yd0QNXSRcPfg=="
+token = "DWQVlWsA7hLnqCCbeBEpfwDRmxFlTinUZe7FfXtdDuQAn854-QQWVtTpcOpVxj0KBCZYK-NWtfmq7l9QeuXueQ=="
 org = "FTN"
 url = "http://localhost:8086"
 bucket = "iot_smart_home"
@@ -84,6 +93,8 @@ def save_to_db(topic, data):
             if alarm_active_button != True:
                 mqtt_client.publish('alarm-on', json.dumps({'':''}), qos=1)
                 alarm_active = True
+                send_message_to_client(alarm_active)
+
                 alarm_active_button = True
                 write_alarm_query(write_api, data['name'], data['_time'], alarm_active,
                               "Button is not pressed for more than 5 seconds", data['simulated'])
@@ -92,6 +103,8 @@ def save_to_db(topic, data):
                 mqtt_client.publish('alarm-off', json.dumps({'':''}), qos=1)
 
                 alarm_active = False
+                send_message_to_client(alarm_active)
+
                 alarm_active_button = False
                 write_alarm_query(write_api, data['name'], data['_time'], alarm_active,
                                   "Button is not pressed anymore", data['simulated'])
@@ -104,6 +117,8 @@ def save_to_db(topic, data):
             if users_inside == 0:
 
                 alarm_active = True
+                send_message_to_client(alarm_active)
+
                 mqtt_client.publish('alarm-on', json.dumps({'':''}), qos=1)
                 write_alarm_query(write_api, data['name'], data['_time'], alarm_active, data['name'] + ' detected movement.', data['simulated'])
             return
@@ -149,6 +164,8 @@ def save_to_db(topic, data):
     elif topic == 'gsg':
         if data['suspicious'] is not None and data['suspicious'] == True:
             alarm_active = True
+            send_message_to_client(alarm_active)
+
             mqtt_client.publish('alarm-on', json.dumps({'':''}), qos=1)
             write_alarm_query(write_api, data['name'], data['_time'], alarm_active, data['name'] + ' detected unusual values.', data['simulated'])
         write_db(write_api, data)
@@ -156,6 +173,8 @@ def save_to_db(topic, data):
         write_db(write_api, data)
     elif topic == 'alarm-on-server':
         alarm_active = True
+        send_message_to_client(alarm_active)
+
         mqtt_client.publish('alarm-on', json.dumps({'':''}), qos=1)
     elif topic == 'dms-entered-pin':
         global current_pin, schedule_safety, system_active
@@ -171,6 +190,8 @@ def save_to_db(topic, data):
                         if current_pin == data['pin'][0:4]:
                             system_active = False
                             alarm_active = False
+                            send_message_to_client(alarm_active)
+
                             publish.single('system-off', json.dumps({'':''}), hostname=HOSTNAME, port=PORT)
                             publish.single('alarm-off', json.dumps({'':''}), hostname=HOSTNAME, port=PORT)
     elif topic == 'bir':
@@ -320,6 +341,8 @@ def deactivate_safety_system(pin):
     system_active = False
     publish.single('system-off', json.dumps({'':''}), hostname=HOSTNAME, port=PORT)
     alarm_active = False
+    send_message_to_client(alarm_active)
+
     publish.single('alarm-off', json.dumps({'':''}), hostname=HOSTNAME, port=PORT)
 
     return json.dumps({'response': 'Alarm successfully deactivated.'})
@@ -375,6 +398,7 @@ def deactivate_system_alarm():
 
     with alarm_lock:
         alarm_active = False
+        send_message_to_client(alarm_active)
         publish.single('alarm-off', json.dumps({'':''}), hostname=HOSTNAME, port=PORT)
     return json.dumps({'response': 'Alarm successfully deactivated.'})
 
@@ -382,8 +406,9 @@ def deactivate_system_alarm():
 if __name__ == '__main__':
     mqtt_client.connect("localhost", 1883, 60)
     mqtt_client.loop_start()
-    
+
     mqtt_client.on_connect = on_connect
     mqtt_client.on_message = lambda client, userdata, msg: save_to_db(msg.topic, json.loads(msg.payload.decode('utf-8')))
+    socketio.init_app(app)
+    socketio.run(app, debug=False)
 
-    app.run(debug=False)
