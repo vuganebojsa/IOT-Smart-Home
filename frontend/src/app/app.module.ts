@@ -18,6 +18,10 @@ import { DmsComponent } from './components/dms/dms.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RgbComponent } from './components/rgb/rgb.component';
 import { HouseStatusComponent } from './components/house-status/house-status.component';
+import { WebsocketService } from '../app/services/websocket.service';
+import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
+
+const config: SocketIoConfig = { url: 'http://localhost:5000', options: {} };
 
 @NgModule({
   declarations: [
@@ -42,9 +46,10 @@ import { HouseStatusComponent } from './components/house-status/house-status.com
     MatSnackBarModule,
     HttpClientModule,
     ReactiveFormsModule,
-    FormsModule
+    FormsModule,
+    SocketIoModule.forRoot(config)
   ],
-  providers: [],
+  providers: [WebsocketService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
