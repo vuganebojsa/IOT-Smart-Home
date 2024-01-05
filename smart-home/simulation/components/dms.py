@@ -10,7 +10,7 @@ from broker_settings import HOSTNAME, PORT
 import json
 dht_batch = []
 publish_data_counter = 0
-publish_data_limit = 3
+publish_data_limit = 0
 
 def publisher_task(event, pir_batch):
     global publish_data_counter, publish_data_limit
