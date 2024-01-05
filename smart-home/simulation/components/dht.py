@@ -22,7 +22,6 @@ def publisher_task(event, dht_batch):
             publish_data_counter = 0
             dht_batch.clear()
         publish.multiple(local_dht_batch, hostname=HOSTNAME, port=PORT)
-        print(f'published {publish_data_limit} dht values')
         event.clear()
 
 
@@ -57,18 +56,14 @@ publisher_thread.daemon = True
 publisher_thread.start()
 
 
-def run_dht(settings, threads, stop_event, code):#
+def run_dht(settings, threads, stop_event, code):
         if settings['simulated']:
-            #print("Starting " + code + " sumilator")
             dht_thread = threading.Thread(target = run_dht_simulator, args=(5, dht_callback, stop_event, settings, publish_event))
             dht_thread.start()
             threads.append(dht_thread)
-            print(code + " sumilator started\n")
         else:
             from sensors.dht import run_dht_loop, DHT
-            #print("Starting " + code + " loop")
             dht = DHT(settings['pin'])
             dht_thread = threading.Thread(target=run_dht_loop, args=(dht, 5, dht_callback, stop_event, settings, publish_event))
             dht_thread.start()
             threads.append(dht_thread)
-            print(code + " loop started")

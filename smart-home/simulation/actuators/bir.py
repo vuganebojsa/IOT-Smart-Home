@@ -84,6 +84,5 @@ def run(bir_callback, stop_event, settings, publish_event):
 		for button in range(len(Buttons)):#Runs through every value in list
 			if hex(Buttons[button]) == inData: #Checks this against incoming
 				bir_callback(ButtonsNames[button], settings, publish_event)
-				print(ButtonsNames[button]) #Prints corresponding english name for button
 		if stop_event.is_set():
 			break

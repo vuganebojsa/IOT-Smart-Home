@@ -21,7 +21,6 @@ def publisher_task(event, pir_batch):
             publish_data_counter = 0
             pir_batch.clear()
         publish.multiple(local_pir_batch, hostname=HOSTNAME, port=PORT)
-        print(f'published {len(local_pir_batch)} dpir values')
         event.clear()
 
 def dpir_callback(motion_detected, settings, publish_event):

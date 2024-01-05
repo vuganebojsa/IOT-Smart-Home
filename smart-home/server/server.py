@@ -10,7 +10,7 @@ from influx_writes import *
 import paho.mqtt.publish as publish
 import schedule
 from threading import Lock
-from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO
 from flask_cors import CORS
 app = Flask(__name__)
 mqtt_client = mqtt.Client()
@@ -18,19 +18,19 @@ CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 @socketio.on('connect')
-def handle_connect(msg):
+def handle_connect():
     print('Client connected')
-    socketio.emit('message_from_server', 'Hello from the server!', namespace='/')
-    send_message_to_client(msg)
+    #socketio.emit('message_from_server', 'Hello from the server!', namespace='/')
+    #send_message_to_client(msg)
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    print('Disconnected')
+
 def send_message_to_client(message):
     # Make sure to use the same namespace if specified
     socketio.emit('message_from_server', message, namespace='/')
-@app.after_request
-def add_cors_headers(response):
-    response.headers['Access-Control-Allow-Origin'] = '*'
-    response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
-    response.headers['Access-Control-Allow-Methods'] = 'OPTIONS, HEAD, GET, POST, PUT, DELETE'
-    return response
+
 
 # InfluxDB Configuration
 users_inside = 0
@@ -44,7 +44,7 @@ schedule_lock = Lock()
 system_lock = Lock()
 alarm_lock = Lock()
 current_pin = ''
-token = "DWQVlWsA7hLnqCCbeBEpfwDRmxFlTinUZe7FfXtdDuQAn854-QQWVtTpcOpVxj0KBCZYK-NWtfmq7l9QeuXueQ=="
+token = "Lb6KSuhfGJ1d-F630vAzLiuEWx7VxtAd1fzceHbRsXuDbNvFooBeR6nUi2drJWPRe9YH89fvDi5eo-KoP-pZUA=="
 org = "FTN"
 url = "http://localhost:8086"
 bucket = "iot_smart_home"

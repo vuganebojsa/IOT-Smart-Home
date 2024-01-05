@@ -21,7 +21,6 @@ def publisher_task(event, bir_batch):
             publish_data_counter = 0
             bir_batch.clear()
         publish.multiple(local_pir_batch, hostname=HOSTNAME, port=PORT)
-        print(f'published {publish_data_limit} bir values')
         event.clear()
 
 def bir_callback(button_pressed, settings, publish_event):

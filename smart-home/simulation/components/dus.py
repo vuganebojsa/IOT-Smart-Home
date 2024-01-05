@@ -21,7 +21,6 @@ def publisher_task(event, pir_batch):
             publish_data_counter = 0
             pir_batch.clear()
         publish.multiple(local_pir_batch, hostname=HOSTNAME, port=PORT)
-        print(f'published {publish_data_limit} dus values')
         event.clear()
 
 def dus_callback(distance, settings, publish_event):

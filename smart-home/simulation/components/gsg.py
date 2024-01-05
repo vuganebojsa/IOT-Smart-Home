@@ -21,7 +21,6 @@ def publisher_task(event, gsc_batch):
             publish_data_counter = 0
             gsc_batch.clear()
         publish.multiple(local_gsc_batch, hostname=HOSTNAME, port=PORT)
-        print(f'published {publish_data_limit} gsg values')
         event.clear()
 
 

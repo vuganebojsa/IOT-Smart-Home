@@ -22,7 +22,6 @@ def publisher_task(event, pir_batch):
             publish_data_counter = 0
             pir_batch.clear()
         publish.single(local_pir_batch[0][0], local_pir_batch[0][1], hostname=HOSTNAME, port=PORT)
-        print(f'published {len(local_pir_batch)} pir values')
         event.clear()
 
 def pir_callback(motion_detected, settings, publish_event):

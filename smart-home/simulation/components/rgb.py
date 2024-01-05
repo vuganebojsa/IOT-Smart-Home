@@ -22,7 +22,6 @@ def publisher_task(event, rgb_batch):
             publish_data_counter = 0
             rgb_batch.clear()
         publish.multiple(local_batch, hostname=HOSTNAME, port=PORT)
-        print(f'published {publish_data_limit} brgb values')
         event.clear()
 
 
@@ -48,7 +47,6 @@ def rgb_callback(settings, publish_event, button_pressed):
         new_color = 'purple'
     elif button_pressed == '7':
         new_color = 'yellow'
-    print(new_color)
     current_datetime = datetime.now()
 
     adjusted_datetime = current_datetime - timedelta(hours=1)

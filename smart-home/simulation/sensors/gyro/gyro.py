@@ -20,7 +20,6 @@ def loop():
         time.sleep(0.1)
         
 if __name__ == '__main__':     # Program start from here
-    print("Program is starting ... ")
     setup()
     try:
         loop()

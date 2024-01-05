@@ -24,7 +24,6 @@ def publisher_task(event, dht_batch):
             publish_data_counter = 0
             dht_batch.clear()
         publish.multiple(local_dht_batch, hostname=HOSTNAME, port=PORT)
-        print(f'published {publish_data_limit} ds values')
         event.clear()
 
 
@@ -50,10 +49,6 @@ def ds_callback(current_value, settings, publish_event, system_event):
     if button_pressed_time is not None and (time.time() - button_pressed_time) > 5 and not button_pressed_5_seconds :
         button_pressed_5_seconds = True
 
-
-
-    if button_pressed_time is not None:
-        print(time.time() - button_pressed_time)
     current_datetime = datetime.now()
 
     adjusted_datetime = current_datetime - timedelta(hours=1)
@@ -86,7 +81,6 @@ def run_ds(settings, threads, stop_event, code, system_event):
             ds_thread = threading.Thread(target = run_ds_simulator, args=(1, ds_callback, stop_event, settings, publish_event, system_event))
             ds_thread.start()
             threads.append(ds_thread)
-            print(code + " sumilator started\n")
         else:
             from sensors.ds import press_button
             pin = settings['pin']

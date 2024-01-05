@@ -22,7 +22,6 @@ def publisher_task(event, dht_batch):
             publish_data_counter = 0
             dht_batch.clear()
         publish.multiple(local_dht_batch, hostname=HOSTNAME, port=PORT)
-        print(f'published {publish_data_limit} dl values')
         event.clear()
 
 
@@ -61,7 +60,6 @@ def dl_callback(settings, publish_event):
         'value': 0,
         '_time': formatted_time
     }
-    print('door light is OFF')
 
     with print_lock:
         dht_batch.append(('dl', json.dumps(payload), 0, True))
@@ -86,4 +84,3 @@ def run_dl(settings, threads, stop_event, code):
             dms_thread = threading.Thread(target=run_light, args=(pin,dl_callback, stop_event, settings, publish_event))
             dms_thread.start()
             threads.append(dms_thread)
-            print(code + " loop started")

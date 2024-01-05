@@ -21,7 +21,6 @@ def publisher_task(event, b4sd_batch):
             publish_data_counter = 0
             b4sd_batch.clear()
         publish.multiple(local_pir_batch, hostname=HOSTNAME, port=PORT)
-        print(f'published {publish_data_limit} b4sd values')
         event.clear()
 
 def b4sd_callback(value, settings, publish_event):
