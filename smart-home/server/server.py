@@ -133,6 +133,7 @@ def save_to_db(topic, data):
                 users_inside -= 1
         if users_inside < 0:
             users_inside = 0
+        write_users_inside(write_api, users_inside)
         write_pir(write_api, data)
     elif topic == 'db':
         write_db(write_api, data)

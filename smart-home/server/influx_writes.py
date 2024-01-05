@@ -120,8 +120,20 @@ def write_dl(write_api, data):
             .tag("simulated", data["simulated"])
             .tag("runs_on", data["runs_on"])
             .tag("name", data["name"])
-            .tag('_time', data['_time'])
             .field("measurement", data["value"])
             .time(data['_time'])
         )
         write_api.write(bucket=bucket_influx, org=org_influx, record=point)
+
+def write_users_inside(write_api, current_count):
+    current_datetime = datetime.now()
+
+    adjusted_datetime = current_datetime - timedelta(hours=1)
+
+    formatted_time = adjusted_datetime.isoformat()
+    point = (
+        Point('Users')
+        .field("measurement", current_count)
+        .time(formatted_time)
+    )
+    write_api.write(bucket=bucket_influx, org=org_influx, record=point)
