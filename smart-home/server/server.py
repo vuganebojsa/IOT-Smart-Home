@@ -288,41 +288,36 @@ def run_schedule():
 def activate_safety_system(pin):
     global current_pin, schedule_safety, system_active
 
-    with pin_lock:
-        with schedule_lock:
-            with system_lock:
-                if '#' in pin:
-                    if len(pin) != 5:
-                        return json.dumps({'error': 'Pin should have 4 characters + #'})
-                else:
-                    if len(pin) != 4:
-                        return json.dumps({'error': 'Pin should have 4 characters'})
-                current_pin = pin[0:4]
-                if system_active is True:
-                    return json.dumps({'error': 'Safety system is already active'})
-                if schedule_safety is True:
-                    return json.dumps({'error': 'Safety system scheduling in progress'})
-                else:
-                    threading.Thread(target=run_schedule, daemon=True).start()
+    if '#' in pin:
+        if len(pin) != 5:
+            return json.dumps({'error': 'Pin should have 4 characters + #'})
+    else:
+        if len(pin) != 4:
+            return json.dumps({'error': 'Pin should have 4 characters'})
+    current_pin = pin[0:4]
+    if system_active is True:
+        return json.dumps({'error': 'Safety system is already active'})
+    if schedule_safety is True:
+        return json.dumps({'error': 'Safety system scheduling in progress'})
+    else:
+        threading.Thread(target=run_schedule, daemon=True).start()
     return json.dumps({'response': 'Alarm successfully activated'})
 
 @app.route('/deactivate-safety-system/<string:pin>', methods=['PUT'])
 def deactivate_safety_system(pin):
     global current_pin, system_active, alarm_active
 
-    with pin_lock:
-        with system_lock:
-            if system_active is False:
-                return json.dumps({'error': 'System is not active'})
-            if '#' in pin:
-                if len(pin) != 5:
-                    return json.dumps({'error': 'Pin should have 4 characters + #'})
-            else:
-                if len(pin) != 4:
-                    return json.dumps({'error': 'Pin should have 4 characters'})
-            if current_pin != pin[0:4]:
-                return json.dumps({'error': 'Incorrect pin. Try again'})
-            system_active = False
+    if system_active is False:
+        return json.dumps({'error': 'System is not active'})
+    if '#' in pin:
+        if len(pin) != 5:
+            return json.dumps({'error': 'Pin should have 4 characters + #'})
+    else:
+        if len(pin) != 4:
+            return json.dumps({'error': 'Pin should have 4 characters'})
+    if current_pin != pin[0:4]:
+        return json.dumps({'error': 'Incorrect pin. Try again'})
+    system_active = False
     publish.single('system-off', json.dumps({'':''}), hostname=HOSTNAME, port=PORT)
     alarm_active = False
     publish.single('alarm-off', json.dumps({'':''}), hostname=HOSTNAME, port=PORT)
