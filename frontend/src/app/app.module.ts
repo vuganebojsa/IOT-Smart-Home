@@ -17,6 +17,7 @@ import { DisplayDeviceComponent } from './components/display-device/display-devi
 import { DmsComponent } from './components/dms/dms.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RgbComponent } from './components/rgb/rgb.component';
+import { HouseStatusComponent } from './components/house-status/house-status.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import { RgbComponent } from './components/rgb/rgb.component';
     DhtComponent,
     DisplayDeviceComponent,
     DmsComponent,
-    RgbComponent
+    RgbComponent,
+    HouseStatusComponent
   ],
   imports: [
     BrowserModule,
