@@ -78,12 +78,10 @@ def save_to_db(topic, data):
             publish.single('dht-lcd-display', json.dumps({'temperature':dht_message}), hostname=HOSTNAME, port=PORT)
         write_dht(write_api, data)
     elif topic == 'dms':
-        print(data)
         write_dms(write_api, data)
     elif topic == 'ds':
         if 'alarm' in data and data['alarm'] == True:
             if alarm_active_button != True:
-                print("UKLJUCIO")
                 mqtt_client.publish('alarm-on', json.dumps({'':''}), qos=1)
                 alarm_active = True
                 alarm_active_button = True
@@ -91,7 +89,6 @@ def save_to_db(topic, data):
                               "Button is not pressed for more than 5 seconds", data['simulated'])
         elif data['alarm'] is not None and data['alarm'] == False:
             if alarm_active_button != False:
-                print("ISKLJUCIO")
                 mqtt_client.publish('alarm-off', json.dumps({'':''}), qos=1)
 
                 alarm_active = False
@@ -103,6 +100,7 @@ def save_to_db(topic, data):
         write_dus(write_api, data)
     elif topic == 'pir':
         if 'RPIR' in data['name']:
+            write_pir(write_api, data)
             if users_inside == 0:
 
                 alarm_active = True
@@ -143,7 +141,6 @@ def save_to_db(topic, data):
     elif topic == 'gsg':
         if data['suspicious'] is not None and data['suspicious'] == True:
             alarm_active = True
-            print('Ukljucen GSG')
             mqtt_client.publish('alarm-on', json.dumps({'':''}), qos=1)
             write_alarm_query(write_api, data['name'], data['_time'], alarm_active, data['name'] + ' detected unusual values.', data['simulated'])
         write_db(write_api, data)
@@ -171,9 +168,7 @@ def save_to_db(topic, data):
     elif topic == 'bir':
         write_db(write_api, data)
     elif topic == 'rgb':
-        print('dosao ovde')
         if data['measurement'] != 'Light':
-            print(data)
             write_db(write_api, data)
 
 def handle_influx_query(query):
@@ -332,7 +327,6 @@ def activate_alarm():
     scheduled = False
     publish.single('clock-activate', json.dumps({'clock':'on'}), hostname=HOSTNAME, port=PORT)
 
-    print("Alarm activated! Ovde pozovite određenu funkciju.")
 @app.route('/set_alarm', methods=['POST'])
 def set_alarm():
     global scheduled
