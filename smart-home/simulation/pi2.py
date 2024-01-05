@@ -98,7 +98,7 @@ if __name__ == "__main__":
         run_ds_threads(settings, threads, stop_event, system_event)
         run_dus_threads(settings, threads, stop_event)
         run_gsc_threads(settings, threads,  stop_event)
-        # run_lcd_threads(settings,threads,stop_event)
+        #run_lcd_threads(settings,threads,stop_event)
 
         while True:
             
