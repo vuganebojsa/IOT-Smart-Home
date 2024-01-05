@@ -43,8 +43,10 @@ pin_lock = Lock()
 schedule_lock = Lock()
 system_lock = Lock()
 alarm_lock = Lock()
+users_lock = Lock()
+alarm_active_button_lock = Lock()
 current_pin = ''
-token = "Lb6KSuhfGJ1d-F630vAzLiuEWx7VxtAd1fzceHbRsXuDbNvFooBeR6nUi2drJWPRe9YH89fvDi5eo-KoP-pZUA=="
+token = "DWQVlWsA7hLnqCCbeBEpfwDRmxFlTinUZe7FfXtdDuQAn854-QQWVtTpcOpVxj0KBCZYK-NWtfmq7l9QeuXueQ=="
 org = "FTN"
 url = "http://localhost:8086"
 bucket = "iot_smart_home"
@@ -90,37 +92,43 @@ def save_to_db(topic, data):
         write_dms(write_api, data)
     elif topic == 'ds':
         if 'alarm' in data and data['alarm'] == True:
-            if alarm_active_button != True:
-                mqtt_client.publish('alarm-on', json.dumps({'':''}), qos=1)
-                alarm_active = True
-                send_message_to_client(alarm_active)
+            with alarm_active_button_lock:
+                if alarm_active_button != True:
+                    mqtt_client.publish('alarm-on', json.dumps({'':''}), qos=1)
+                    with alarm_lock:
+                        alarm_active = True
+                        print(topic)
+                        send_message_to_client(alarm_active)
 
-                alarm_active_button = True
-                write_alarm_query(write_api, data['name'], data['_time'], alarm_active,
-                              "Button is not pressed for more than 5 seconds", data['simulated'])
+                        alarm_active_button = True
+                        write_alarm_query(write_api, data['name'], data['_time'], alarm_active,
+                                      "Button is not pressed for more than 5 seconds", data['simulated'])
         elif data['alarm'] is not None and data['alarm'] == False:
-            if alarm_active_button != False:
-                mqtt_client.publish('alarm-off', json.dumps({'':''}), qos=1)
+            with alarm_active_button_lock:
+                if alarm_active_button != False:
 
-                alarm_active = False
-                send_message_to_client(alarm_active)
-
-                alarm_active_button = False
-                write_alarm_query(write_api, data['name'], data['_time'], alarm_active,
-                                  "Button is not pressed anymore", data['simulated'])
+                    mqtt_client.publish('alarm-off', json.dumps({'':''}), qos=1)
+                    with alarm_lock:
+                        alarm_active = False
+                        send_message_to_client(alarm_active)
+                        alarm_active_button = False
+                        write_alarm_query(write_api, data['name'], data['_time'], alarm_active,
+                                          "Button is not pressed anymore", data['simulated'])
         write_ds(write_api, data)
     elif topic == 'dus':
         write_dus(write_api, data)
     elif topic == 'pir':
         if 'RPIR' in data['name']:
             write_pir(write_api, data)
-            if users_inside == 0:
+            with users_lock:
+                if users_inside == 0:
+                    with alarm_lock:
+                        alarm_active = True
+                        print(topic)
+                        send_message_to_client(alarm_active)
 
-                alarm_active = True
-                send_message_to_client(alarm_active)
-
-                mqtt_client.publish('alarm-on', json.dumps({'':''}), qos=1)
-                write_alarm_query(write_api, data['name'], data['_time'], alarm_active, data['name'] + ' detected movement.', data['simulated'])
+                        mqtt_client.publish('alarm-on', json.dumps({'':''}), qos=1)
+                        write_alarm_query(write_api, data['name'], data['_time'], alarm_active, data['name'] + ' detected movement.', data['simulated'])
             return
         query_data = []
         if data['name'] == 'DPIR1':
@@ -145,17 +153,19 @@ def save_to_db(topic, data):
             if query_data['data'][0]['_value'] > query_data['data'][2]['_value']:
                 is_entering = True
             if is_entering:
-                users_inside += 1
-                write_users_inside(write_api, users_inside, 'user entered')
+                with users_lock:
+                    users_inside += 1
+                    write_users_inside(write_api, users_inside, 'user entered')
 
             else:
-                users_inside -= 1
-                if users_inside < 0:
-                    users_inside = 0
-                write_users_inside(write_api, users_inside, 'user left')
-
-        if users_inside < 0:
-            users_inside = 0
+                with users_lock:
+                    users_inside -= 1
+                    if users_inside < 0:
+                        users_inside = 0
+                    write_users_inside(write_api, users_inside, 'user left')
+        with users_lock:
+            if users_inside < 0:
+                users_inside = 0
         write_pir(write_api, data)
     elif topic == 'db':
         write_db(write_api, data)
@@ -163,18 +173,21 @@ def save_to_db(topic, data):
         write_dl(write_api, data)
     elif topic == 'gsg':
         if data['suspicious'] is not None and data['suspicious'] == True:
-            alarm_active = True
-            send_message_to_client(alarm_active)
+            with alarm_lock:
+                alarm_active = True
+                print(topic)
+                send_message_to_client(alarm_active)
 
-            mqtt_client.publish('alarm-on', json.dumps({'':''}), qos=1)
-            write_alarm_query(write_api, data['name'], data['_time'], alarm_active, data['name'] + ' detected unusual values.', data['simulated'])
+                mqtt_client.publish('alarm-on', json.dumps({'':''}), qos=1)
+                write_alarm_query(write_api, data['name'], data['_time'], alarm_active, data['name'] + ' detected unusual values.', data['simulated'])
         write_db(write_api, data)
     elif topic == 'lcd' or topic == 'b4sd':
         write_db(write_api, data)
     elif topic == 'alarm-on-server':
-        alarm_active = True
-        send_message_to_client(alarm_active)
-
+        with alarm_lock:
+            alarm_active = True
+            print(topic)
+            send_message_to_client(alarm_active)
         mqtt_client.publish('alarm-on', json.dumps({'':''}), qos=1)
     elif topic == 'dms-entered-pin':
         global current_pin, schedule_safety, system_active
@@ -187,13 +200,14 @@ def save_to_db(topic, data):
             else:
                 with pin_lock:
                     with system_lock:
-                        if current_pin == data['pin'][0:4]:
-                            system_active = False
-                            alarm_active = False
-                            send_message_to_client(alarm_active)
+                        with alarm_lock:
+                            if current_pin == data['pin'][0:4]:
+                                system_active = False
+                                alarm_active = False
+                                send_message_to_client(alarm_active)
 
-                            publish.single('system-off', json.dumps({'':''}), hostname=HOSTNAME, port=PORT)
-                            publish.single('alarm-off', json.dumps({'':''}), hostname=HOSTNAME, port=PORT)
+                                publish.single('system-off', json.dumps({'':''}), hostname=HOSTNAME, port=PORT)
+                                publish.single('alarm-off', json.dumps({'':''}), hostname=HOSTNAME, port=PORT)
     elif topic == 'bir':
         write_db(write_api, data)
     elif topic == 'rgb':
@@ -315,34 +329,43 @@ def activate_safety_system(pin):
     else:
         if len(pin) != 4:
             return json.dumps({'error': 'Pin should have 4 characters'})
-    current_pin = pin[0:4]
-    if system_active is True:
-        return json.dumps({'error': 'Safety system is already active'})
-    if schedule_safety is True:
-        return json.dumps({'error': 'Safety system scheduling in progress'})
-    else:
-        threading.Thread(target=run_schedule, daemon=True).start()
+    with pin_lock:
+        current_pin = pin[0:4]
+    with system_lock:
+        if system_active is True:
+            return json.dumps({'error': 'Safety system is already active'})
+    with schedule_lock:
+        if schedule_safety is True:
+            return json.dumps({'error': 'Safety system scheduling in progress'})
+
+    threading.Thread(target=run_schedule, daemon=True).start()
     return json.dumps({'response': 'Alarm successfully activated'})
 
 @app.route('/deactivate-safety-system/<string:pin>', methods=['PUT'])
 def deactivate_safety_system(pin):
     global current_pin, system_active, alarm_active
 
-    if system_active is False:
-        return json.dumps({'error': 'System is not active'})
+    with system_lock:
+        if system_active is False:
+            return json.dumps({'error': 'System is not active'})
+
     if '#' in pin:
         if len(pin) != 5:
             return json.dumps({'error': 'Pin should have 4 characters + #'})
     else:
         if len(pin) != 4:
             return json.dumps({'error': 'Pin should have 4 characters'})
-    if current_pin != pin[0:4]:
-        return json.dumps({'error': 'Incorrect pin. Try again'})
-    system_active = False
-    publish.single('system-off', json.dumps({'':''}), hostname=HOSTNAME, port=PORT)
-    alarm_active = False
-    send_message_to_client(alarm_active)
 
+    with pin_lock:
+        if current_pin != pin[0:4]:
+            return json.dumps({'error': 'Incorrect pin. Try again'})
+    with system_lock:
+        system_active = False
+    with alarm_lock:
+        alarm_active = False
+        send_message_to_client(alarm_active)
+
+    publish.single('system-off', json.dumps({'':''}), hostname=HOSTNAME, port=PORT)
     publish.single('alarm-off', json.dumps({'':''}), hostname=HOSTNAME, port=PORT)
 
     return json.dumps({'response': 'Alarm successfully deactivated.'})
@@ -350,6 +373,7 @@ def deactivate_safety_system(pin):
 def activate_alarm():
     global clock_active, scheduled
     clock_active = True
+
     scheduled = False
     publish.single('clock-activate', json.dumps({'clock':'on'}), hostname=HOSTNAME, port=PORT)
 
@@ -360,6 +384,7 @@ def set_alarm():
         data = request.get_json()
         alarm_time = data.get("alarm_time")
         print(f"Postavljen alarm za: {alarm_time}")
+
         if not scheduled:
             alarm_time_obj = datetime.strptime(alarm_time, "%H:%M").time()
             print(alarm_time_obj.strftime("%H:%M"))
